@@ -1,10 +1,16 @@
-export type LoginCredentials = {
+export type SignInCredentials = {
   email: string;
   password: string;
 };
 
 export type AuthenticatedUser = {
-  id: string;
-  name: string;
-  email: string;
+  code: number;
+  message: string;
+  data?: {
+    token: string;
+    user: {
+      name: string;
+      email: string;
+    }
+  }
 };
