@@ -7,10 +7,8 @@ import { authApi } from "@/features/auth/api/auth-api";
 import { signInSchema } from "@/features/auth/validator/sign-in-validator";
 
 export async function sendSignInAction(previousState: any, actionPayload: { get: (arg0: string) => any; }){
-    const credentials = signInSchema.safeParse({
-        email: actionPayload.get("email"),
-        password: actionPayload.get("password"),
-    });
+    
+    const credentials = signInSchema.safeParse({ email: actionPayload.get("email"), password: actionPayload.get("password")});
 
     if(!credentials.success){
         return {
@@ -22,25 +20,26 @@ export async function sendSignInAction(previousState: any, actionPayload: { get:
 
     const response = await authApi.signIn({ email, password });
 
-    if(response && response.code){
+    //if(response && response.code){
 
-        // Senha ou Email incorreto
-        if(response.code == 2){
-            return {
-                success: false,
-                message: "Email ou Senha incorretos, por favor, tente novamente."
-            }
-        }
+        // TODO: Implementar conforme o backend finalizar
+        // // Senha ou Email incorreto
+        // if(response.code == 2){
+        //     return {
+        //         success: false,
+        //         message: "Email ou Senha incorretos, por favor, tente novamente."
+        //     }
+        // }
 
-        if(response.code == 1 && response.data && response.data.token){
-            await saveItemOnCookie(
-                ACCESS_TOKEN_COOKIE,
-                response.data.token
-            );
+        // if(response.code == 1 && response.data && response.data.token){
+        //     await saveItemOnCookie(
+        //         ACCESS_TOKEN_COOKIE,
+        //         response.data.token
+        //     );
 
-            redirect("/");
-        }
-    }
+        //     redirect("/");
+        // }
+    //}
 
 
     return {

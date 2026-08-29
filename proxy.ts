@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isJwtExpired } from "@/core/auth/jwt";
 import { ACCESS_TOKEN_COOKIE } from "@/core/cookies/constants";
 
-const PUBLIC_ROUTES = ["/sign-in"];
+const PUBLIC_ROUTES = ["/sign-in"]; // TODO: Colocar no .env as rotas publicas (fica mais fácil dar manutenção, seria legal até ter uma tabela que contra isso)
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;

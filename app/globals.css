@@ -3,11 +3,62 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  --blue-50: #eef7ff;
+  --blue-100: #e6f2ff;
+  --blue-200: #cae5ff;
+  --blue-500: #55aaff;
+  --blue-600: #4d99e6;
+  --blue-700: #4488cc;
+  --blue-800: #4080bf;
+  --blue-900: #336699;
+  --blue-950: #264c73;
+  --blue-1000: #1e3b59;
+
+  --primary: var(--blue-500);
+  --primary-hover: var(--blue-600);
+  --primary-active: var(--blue-700);
+
+  --primary-light: var(--blue-50);
+  --primary-light-hover: var(--blue-100);
+  --primary-light-active: var(--blue-200);
+
+  --primary-dark: var(--blue-800);
+  --primary-dark-hover: var(--blue-900);
+  --primary-dark-active: var(--blue-950);
+
+  --primary-darker: var(--blue-1000);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+
+  --color-blue-50: var(--blue-50);
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-500: var(--blue-500);
+  --color-blue-600: var(--blue-600);
+  --color-blue-700: var(--blue-700);
+  --color-blue-800: var(--blue-800);
+  --color-blue-900: var(--blue-900);
+  --color-blue-950: var(--blue-950);
+  --color-blue-1000: var(--blue-1000);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+
+  --color-primary-light: var(--primary-light);
+  --color-primary-light-hover: var(--primary-light-hover);
+  --color-primary-light-active: var(--primary-light-active);
+
+  --color-primary-dark: var(--primary-dark);
+  --color-primary-dark-hover: var(--primary-dark-hover);
+  --color-primary-dark-active: var(--primary-dark-active);
+
+  --color-primary-darker: var(--primary-darker);
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
