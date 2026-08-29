@@ -11,7 +11,7 @@ Frontend da plataforma Aulooo, construído com [Next.js](https://nextjs.org) (Ap
 
 ```bash
 # 1. Clone o repositório
-git clone <url-do-repositorio>
+git clone git@github.com:Aulooo/aulooo-web.git
 cd aulooo-web
 
 # 2. Instale as dependências

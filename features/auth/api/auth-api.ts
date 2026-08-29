@@ -1,7 +1,6 @@
 import { apiClient } from "@/core/http/api-client";
-import type { AuthenticatedUser, LoginCredentials } from "../types";
+import type { AuthenticatedUser, SignInCredentials } from "../types";
 
 export const authApi = {
-  login: (credentials: LoginCredentials) =>
-    apiClient.post<AuthenticatedUser>("/auth/login", credentials),
+  signIn: (credentials: SignInCredentials) => apiClient.post<AuthenticatedUser>("/auth/sign-in", credentials),
 };
