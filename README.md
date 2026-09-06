@@ -37,6 +37,11 @@ Abra [http://localhost:3000](http://localhost:3000) no navegador. A aplicação 
 - [React 19](https://react.dev)
 - [TypeScript](https://www.typescriptlang.org)
 - [Tailwind CSS 4](https://tailwindcss.com)
+- [shadcn/ui](https://ui.shadcn.com) (style "Nova" / `radix-nova`) + [lucide](https://lucide.dev) para ícones
+
+> **Front-end sem back-end:** o back ainda está em desenvolvimento, então as telas rodam com
+> dados mockados (`mock/`) e um bypass de auth em dev.
+> **Começando agora no projeto? Leia [`docs/status.md`](./docs/status.md).**
 
 ## Padrão de desenvolvimento: Feature Components
 
