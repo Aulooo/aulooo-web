@@ -1,0 +1,66 @@
+import type { Lesson } from "@/features/schedule";
+import { isoIn } from "./_helpers";
+import { MOCK_TEACHER_ID } from "./students";
+
+export const MOCK_LESSONS: Lesson[] = [
+  {
+    id: "les_01",
+    title: "Treino — Beatriz Lima",
+    startsAt: isoIn(0, 18),
+    durationMin: 60,
+    mode: "in_person",
+    location: "Sala 2",
+    teacherId: MOCK_TEACHER_ID,
+    studentId: "usr_aluno",
+  },
+  {
+    id: "les_02",
+    title: "Treino — Caio Ferreira",
+    startsAt: isoIn(0, 19),
+    durationMin: 60,
+    mode: "in_person",
+    location: "Sala 2",
+    teacherId: MOCK_TEACHER_ID,
+    studentId: "std_02",
+  },
+  {
+    id: "les_03",
+    title: "Turma HIIT",
+    startsAt: isoIn(1, 7),
+    durationMin: 45,
+    mode: "in_person",
+    location: "Sala 1",
+    teacherId: MOCK_TEACHER_ID,
+    studentId: null,
+  },
+  {
+    id: "les_04",
+    title: "Consultoria online — Marina Duarte",
+    startsAt: isoIn(1, 12),
+    durationMin: 30,
+    mode: "online",
+    location: "https://meet.google.com/abc-defg-hij",
+    teacherId: MOCK_TEACHER_ID,
+    studentId: "std_03",
+  },
+  {
+    id: "les_05",
+    title: "Treino — Beatriz Lima",
+    startsAt: isoIn(3, 18),
+    durationMin: 60,
+    mode: "in_person",
+    location: "Sala 2",
+    teacherId: MOCK_TEACHER_ID,
+    studentId: "usr_aluno",
+  },
+  {
+    id: "les_06",
+    title: "Treino — Helena Rocha",
+    startsAt: isoIn(4, 8),
+    durationMin: 60,
+    mode: "in_person",
+    location: "Sala 3",
+    teacherId: MOCK_TEACHER_ID,
+    studentId: "std_05",
+  },
+];

@@ -1,2 +1,2 @@
 export { SignInForm } from "./components/sign-in-form";
-export type { AuthenticatedUser, SignInCredentials } from "./types";
+export type { AuthenticatedUser, SignInCredentials, Role, SessionUser } from "./types";

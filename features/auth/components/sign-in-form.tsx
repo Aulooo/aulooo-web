@@ -1,6 +1,6 @@
 "use client"
 import { sendSignInAction } from "@/app/(auth)/sign-in/action/sign-in-action";
-import { Button } from "@/shared/components/Button";
+import { Button } from "@/shared/components/ui/button";
 import { useActionState } from "react";
 
 

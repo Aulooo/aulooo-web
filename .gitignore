@@ -41,3 +41,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# mock: sandbox local de dados (cada dev tem o seu; recriado a partir do seed)
+/mock/*.data.json

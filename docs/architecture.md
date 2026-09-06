@@ -130,5 +130,17 @@ Crie uma pasta em `features/` quando o código representa uma funcionalidade de 
 ## Convenções de nomenclatura
 
 - Componentes React: `PascalCase.tsx` (`LoginForm.tsx`).
+- **Tipos de props num arquivo irmão `PascalCase.types.ts`** (`LoginForm.types.ts`) — não
+  inline no componente, para não misturar a UI com os contratos. Os primitivos gerados pelo
+  shadcn (`shared/components/ui/`) são a exceção: mantêm o padrão da ferramenta.
 - Hooks, utils, api: `kebab-case.ts` (`use-login.ts`, `auth-api.ts`).
+- Tipos/contratos de um domínio: `features/<x>/types.ts` (compartilhados pela feature).
 - Sempre importe via alias `@/...` (configurado em `tsconfig.json`), nunca caminhos relativos saindo da própria feature (`../../../`).
+
+## Camadas auxiliares
+
+- **`shared/components/ui/`** — primitivos do shadcn ("Nova"), gerados via CLI. `cn` vem do
+  pacote `cn`. Componentes compostos com significado próprio ficam fora de `ui/`.
+- **`shared/lib/`** — helpers genéricos (`cn`, formatadores, `initials`).
+- **`mock/`** — camada **dev-only** com dados falsos enquanto o back-end não existe. Pode ser
+  importada por `features/` e `app/`. Ver [`frontend-mock-first.md`](./frontend-mock-first.md).
