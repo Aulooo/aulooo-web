@@ -1,1 +1,2 @@
-export type { Lesson, LessonMode } from "./types";
+export { AgendaView } from "./components/AgendaView";
+export type { Lesson, LessonMode, LessonStatus, LessonInput } from "./types";

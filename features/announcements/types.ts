@@ -11,3 +11,12 @@ export type Announcement = {
   pinned?: boolean;
   publishedAt: string;
 };
+
+/** O que a Server Action recebe para publicar/editar um aviso. */
+export type AnnouncementInput = {
+  title: string;
+  body: string;
+  audience: AnnouncementAudience;
+  studentId: string | null;
+  pinned: boolean;
+};

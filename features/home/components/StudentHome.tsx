@@ -8,8 +8,8 @@ import { NextLessonCard } from "./NextLessonCard";
 import { SeeAllLink } from "./SeeAllLink";
 import type { HomeScreenProps } from "./home-screen-props";
 
-export function StudentHome({ user }: HomeScreenProps) {
-  const data = getStudentHomeData(user.id, user.name.split(" ")[0]);
+export async function StudentHome({ user }: HomeScreenProps) {
+  const data = await getStudentHomeData(user.id, user.name.split(" ")[0]);
 
   return (
     <div className="space-y-6">

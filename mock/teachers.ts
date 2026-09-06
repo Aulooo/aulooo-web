@@ -1,6 +1,16 @@
-import type { Teacher } from "@/features/teachers";
 import { isoIn } from "./_helpers";
 import { MOCK_STUDENTS, MOCK_TEACHER_ID } from "./students";
+
+/** Dados brutos de professor — fonte do seed de `mock/db/people`. */
+type Teacher = {
+  id: string;
+  name: string;
+  avatarUrl?: string | null;
+  email: string;
+  status: "active" | "inactive";
+  studentCount: number;
+  joinedAt: string;
+};
 
 /** Para a visão do administrador. Rafael bate com MOCK_USERS.professor. */
 export const MOCK_TEACHERS: Teacher[] = [

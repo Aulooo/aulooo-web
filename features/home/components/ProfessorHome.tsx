@@ -11,8 +11,8 @@ import { QuickActions } from "./QuickActions";
 import { SeeAllLink } from "./SeeAllLink";
 import type { HomeScreenProps } from "./home-screen-props";
 
-export function ProfessorHome({ user }: HomeScreenProps) {
-  const data = getProfessorHomeData(user.id, user.name.split(" ")[0]);
+export async function ProfessorHome({ user }: HomeScreenProps) {
+  const data = await getProfessorHomeData(user.id, user.name.split(" ")[0]);
 
   return (
     <div className="space-y-6">

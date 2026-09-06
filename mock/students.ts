@@ -1,5 +1,19 @@
-import type { Student } from "@/features/students";
 import { isoIn } from "./_helpers";
+
+/** Dados brutos de aluno — fonte do seed de `mock/db/people` (não é a fonte da verdade). */
+type Student = {
+  id: string;
+  name: string;
+  avatarUrl?: string | null;
+  email: string;
+  phone: string;
+  status: "active" | "trial" | "inactive";
+  plan: string;
+  monthlyFeeCents: number;
+  dueDay: number;
+  teacherId: string;
+  joinedAt: string;
+};
 
 /** Professor dono da carteira (bate com MOCK_USERS.professor.id em ./session). */
 export const MOCK_TEACHER_ID = "usr_prof";

@@ -1,36 +1,45 @@
-import { MOCK_ANNOUNCEMENTS } from "@/mock/announcements";
-import { MOCK_PAYMENTS } from "@/mock/payments";
-import { MOCK_STUDENTS, MOCK_STUDENTS_BY_ID } from "@/mock/students";
-import { MOCK_TEACHERS } from "@/mock/teachers";
+import { announcementsDb } from "@/mock/db/announcements";
+import { paymentsDb } from "@/mock/db/payments";
+import { peopleDb } from "@/mock/db/people";
 import { monthKey } from "@/mock/_helpers";
 import type { ActivityItem, AdminHomeData } from "../types";
 
 const sumCents = (total: number, p: { amountCents: number }) => total + p.amountCents;
-const studentName = (id: string) => MOCK_STUDENTS_BY_ID[id]?.name ?? "Aluno";
 
-export function getAdminHomeData(firstName: string, tenantName: string): AdminHomeData {
-  const activeStudents = MOCK_STUDENTS.filter((s) => s.status !== "inactive").length;
-  const activeTeachers = MOCK_TEACHERS.filter((t) => t.status === "active").length;
+export async function getAdminHomeData(
+  firstName: string,
+  tenantName: string,
+): Promise<AdminHomeData> {
+  const [people, payments, announcements] = await Promise.all([
+    peopleDb.list(),
+    paymentsDb.list(),
+    announcementsDb.list(),
+  ]);
 
-  const currentPayments = MOCK_PAYMENTS.filter((p) => p.referenceMonth === monthKey(0));
+  const nameById = new Map(people.map((p) => [p.id, p.name] as const));
+  const students = people.filter((p) => p.roles.includes("aluno"));
+  const teachers = people.filter((p) => p.roles.includes("professor"));
+
+  const currentPayments = payments.filter((p) => p.referenceMonth === monthKey(0));
   const revenueCents = currentPayments.filter((p) => p.status === "paid").reduce(sumCents, 0);
   const overdue = currentPayments.filter((p) => p.status === "overdue");
-  const overdueCents = overdue.reduce(sumCents, 0);
 
   const activity: ActivityItem[] = [
-    ...MOCK_PAYMENTS.filter((p) => p.status === "paid" && p.paidAt).map((p) => ({
-      id: `act_pay_${p.id}`,
-      kind: "payment" as const,
-      text: `${studentName(p.studentId)} pagou a mensalidade`,
-      at: p.paidAt as string,
-    })),
-    ...MOCK_STUDENTS.map((s) => ({
+    ...payments
+      .filter((p) => p.status === "paid" && p.paidAt)
+      .map((p) => ({
+        id: `act_pay_${p.id}`,
+        kind: "payment" as const,
+        text: `${nameById.get(p.studentId) ?? "Aluno"} pagou a mensalidade`,
+        at: p.paidAt as string,
+      })),
+    ...students.map((s) => ({
       id: `act_std_${s.id}`,
       kind: "student" as const,
       text: `${s.name} entrou como aluno`,
-      at: s.joinedAt,
+      at: s.createdAt,
     })),
-    ...MOCK_ANNOUNCEMENTS.map((a) => ({
+    ...announcements.map((a) => ({
       id: `act_ann_${a.id}`,
       kind: "announcement" as const,
       text: `Aviso publicado: “${a.title}”`,
@@ -43,10 +52,10 @@ export function getAdminHomeData(firstName: string, tenantName: string): AdminHo
   return {
     firstName,
     tenantName,
-    activeStudents,
-    activeTeachers,
+    activeStudents: students.filter((s) => s.status !== "inactive").length,
+    activeTeachers: teachers.filter((t) => t.status === "active").length,
     revenueCents,
-    overdueCents,
+    overdueCents: overdue.reduce(sumCents, 0),
     overdueCount: overdue.length,
     activity,
   };

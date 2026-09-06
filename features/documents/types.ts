@@ -16,3 +16,12 @@ export type StudyDocument = {
   studentId?: string | null;
   uploadedAt: string;
 };
+
+/** O que a Server Action recebe para publicar/editar um material. */
+export type DocumentInput = {
+  title: string;
+  kind: DocumentKind;
+  url: string;
+  audience: DocumentAudience;
+  studentId: string | null;
+};

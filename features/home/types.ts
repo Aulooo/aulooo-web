@@ -2,12 +2,11 @@ import type { Announcement } from "@/features/announcements";
 import type { StudyDocument } from "@/features/documents";
 import type { Payment } from "@/features/payments";
 import type { Lesson } from "@/features/schedule";
-import type { Student } from "@/features/students";
 
-/** Pagamento em aberto já enriquecido com o aluno e o atraso. */
+/** Pagamento em aberto já enriquecido com o nome do aluno e o atraso. */
 export type PendingPayment = {
   payment: Payment;
-  student: Student;
+  studentName: string;
   daysOverdue: number;
 };
 

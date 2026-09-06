@@ -10,8 +10,8 @@ import { HomeGreeting } from "./HomeGreeting";
 import { QuickActions } from "./QuickActions";
 import type { HomeScreenProps } from "./home-screen-props";
 
-export function AdminHome({ user }: HomeScreenProps) {
-  const data = getAdminHomeData(user.name.split(" ")[0], user.tenantName);
+export async function AdminHome({ user }: HomeScreenProps) {
+  const data = await getAdminHomeData(user.name.split(" ")[0], user.tenantName);
 
   return (
     <div className="space-y-6">

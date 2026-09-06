@@ -1,43 +1,52 @@
-import { MOCK_ANNOUNCEMENTS } from "@/mock/announcements";
-import { MOCK_PAYMENTS } from "@/mock/payments";
-import { MOCK_LESSONS } from "@/mock/schedule";
-import { MOCK_STUDENTS, MOCK_STUDENTS_BY_ID } from "@/mock/students";
-import { monthKey } from "@/mock/_helpers";
+import { announcementsDb } from "@/mock/db/announcements";
+import { lessonsDb } from "@/mock/db/lessons";
+import { paymentsDb } from "@/mock/db/payments";
+import { peopleDb } from "@/mock/db/people";
 import type { ProfessorHomeData } from "../types";
 import { byPublishedDesc, byStartAsc, daysOverdue, isToday } from "./date-range";
 
 const sumCents = (total: number, p: { amountCents: number }) => total + p.amountCents;
 
-export function getProfessorHomeData(teacherId: string, firstName: string): ProfessorHomeData {
-  const students = MOCK_STUDENTS.filter((s) => s.teacherId === teacherId);
-  const activeStudents = students.filter((s) => s.status === "active").length;
+export async function getProfessorHomeData(
+  teacherId: string,
+  firstName: string,
+): Promise<ProfessorHomeData> {
+  const [students, currentPayments, teacherLessons, announcements] = await Promise.all([
+    peopleDb.students(teacherId),
+    paymentsDb.currentMonth(),
+    lessonsDb.forTeacher(teacherId),
+    announcementsDb.byAuthor(teacherId),
+  ]);
 
-  const currentPayments = MOCK_PAYMENTS.filter((p) => p.referenceMonth === monthKey(0));
-  const receivedCents = currentPayments.filter((p) => p.status === "paid").reduce(sumCents, 0);
-  const toReceiveCents = currentPayments.filter((p) => p.status !== "paid").reduce(sumCents, 0);
+  const studentIds = new Set(students.map((s) => s.id));
+  const activeIds = new Set(students.filter((s) => s.status !== "inactive").map((s) => s.id));
+  const nameById = new Map(students.map((s) => [s.id, s.name] as const));
 
-  const lessonsToday = MOCK_LESSONS.filter((l) => isToday(l.startsAt)).sort(byStartAsc);
+  const mine = currentPayments.filter((p) => studentIds.has(p.studentId));
+  const receivedCents = mine.filter((p) => p.status === "paid").reduce(sumCents, 0);
+  const toReceiveCents = mine.filter((p) => p.status !== "paid").reduce(sumCents, 0);
 
-  const pendingPayments = currentPayments
-    .filter((p) => p.status !== "paid")
+  const lessonsToday = teacherLessons
+    .filter((l) => l.status !== "canceled" && isToday(l.startsAt))
+    .sort(byStartAsc);
+
+  const pendingPayments = mine
+    .filter((p) => p.status !== "paid" && activeIds.has(p.studentId))
     .map((payment) => ({
       payment,
-      student: MOCK_STUDENTS_BY_ID[payment.studentId],
+      studentName: nameById.get(payment.studentId) ?? "Aluno",
       daysOverdue: payment.status === "overdue" ? daysOverdue(payment.dueDate) : 0,
     }))
-    .filter((row) => row.student && row.student.status !== "inactive")
     .sort((a, b) => b.daysOverdue - a.daysOverdue)
     .slice(0, 4);
 
-  const announcements = [...MOCK_ANNOUNCEMENTS].sort(byPublishedDesc).slice(0, 2);
-
   return {
     firstName,
-    activeStudents,
+    activeStudents: students.filter((s) => s.status === "active").length,
     receivedCents,
     toReceiveCents,
     lessonsToday,
     pendingPayments,
-    announcements,
+    announcements: [...announcements].sort(byPublishedDesc).slice(0, 2),
   };
 }

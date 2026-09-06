@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { peopleStore } from "@/mock/people-store";
+import { peopleDb } from "@/mock/db/people";
 import { personInputSchema } from "../lib/person-schema";
 import type { PersonActionState, PersonInput, PersonRole } from "../types";
 
@@ -56,16 +56,17 @@ export async function savePerson(
     return { ok: false, message: "Confira os campos destacados.", errors };
   }
 
-  const existing = await peopleStore.findByEmail(parsed.data.email);
+  const existing = await peopleDb.findByEmail(parsed.data.email);
   if (existing && existing.id !== id) {
     return { ok: false, errors: { email: "Já existe uma pessoa com esse e-mail." } };
   }
 
   const data = parsed.data as PersonInput;
-  const person = id ? await peopleStore.update(id, data) : await peopleStore.create(data);
+  const person = id ? await peopleDb.update(id, data) : await peopleDb.create(data);
   if (!person) return { ok: false, message: "Pessoa não encontrada." };
 
   revalidatePath("/usuarios");
+  revalidatePath("/alunos");
   return {
     ok: true,
     personId: person.id,

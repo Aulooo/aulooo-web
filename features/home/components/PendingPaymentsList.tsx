@@ -17,13 +17,13 @@ export function PendingPaymentsList({ items }: PendingPaymentsListProps) {
   return (
     <Card className="py-0">
       <ul className="divide-y divide-border">
-        {items.map(({ payment, student, daysOverdue }) => (
+        {items.map(({ payment, studentName, daysOverdue }) => (
           <li key={payment.id} className="flex items-center gap-3 px-4 py-3">
             <Avatar size="sm">
-              <AvatarFallback>{initials(student.name)}</AvatarFallback>
+              <AvatarFallback>{initials(studentName)}</AvatarFallback>
             </Avatar>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-foreground">{student.name}</p>
+              <p className="truncate text-sm font-medium text-foreground">{studentName}</p>
               <p className="text-xs text-muted-foreground">
                 {payment.status === "overdue"
                   ? `Atrasada há ${daysOverdue} dia(s)`
