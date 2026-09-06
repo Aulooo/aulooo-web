@@ -1,0 +1,68 @@
+import type { StudyDocument } from "@/features/documents";
+import { isoIn } from "./_helpers";
+import { MOCK_TEACHER_ID } from "./students";
+
+export const MOCK_DOCUMENTS: StudyDocument[] = [
+  {
+    id: "doc_01",
+    title: "Plano de treino — Semana 12",
+    kind: "pdf",
+    sizeBytes: 480_000,
+    url: "#",
+    authorId: MOCK_TEACHER_ID,
+    audience: "all",
+    uploadedAt: isoIn(-1, 8),
+  },
+  {
+    id: "doc_02",
+    title: "Vídeo: correção de postura no agachamento",
+    kind: "video",
+    sizeBytes: 88_000_000,
+    url: "#",
+    authorId: MOCK_TEACHER_ID,
+    audience: "all",
+    uploadedAt: isoIn(-3, 19),
+  },
+  {
+    id: "doc_03",
+    title: "Ficha individual — Beatriz",
+    kind: "sheet",
+    sizeBytes: 22_000,
+    url: "#",
+    authorId: MOCK_TEACHER_ID,
+    audience: "student",
+    studentId: "usr_aluno",
+    uploadedAt: isoIn(-5, 10),
+  },
+  {
+    id: "doc_04",
+    title: "Guia de alimentação pré-treino",
+    kind: "doc",
+    sizeBytes: 130_000,
+    url: "#",
+    authorId: MOCK_TEACHER_ID,
+    audience: "all",
+    uploadedAt: isoIn(-9, 14),
+  },
+  {
+    id: "doc_05",
+    title: "Playlist de mobilidade (YouTube)",
+    kind: "link",
+    sizeBytes: null,
+    url: "https://youtube.com",
+    authorId: MOCK_TEACHER_ID,
+    audience: "all",
+    uploadedAt: isoIn(-12, 9),
+  },
+  {
+    id: "doc_06",
+    title: "Avaliação física — Beatriz (março)",
+    kind: "pdf",
+    sizeBytes: 1_250_000,
+    url: "#",
+    authorId: MOCK_TEACHER_ID,
+    audience: "student",
+    studentId: "usr_aluno",
+    uploadedAt: isoIn(-21, 11),
+  },
+];
