@@ -7,6 +7,15 @@ const PUBLIC_ROUTES = ["/sign-in"]; // TODO: Colocar no .env as rotas publicas (
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // ----------------------------------------------------------------------------
+  // DEV BYPASS — enquanto o backend de autenticação não existe, libera todas as
+  // rotas em desenvolvimento para permitir trabalhar o front sem login real.
+  // REMOVER quando o fluxo de auth do backend estiver pronto.
+  // ----------------------------------------------------------------------------
+  if (process.env.NODE_ENV !== "production") {
+    return NextResponse.next();
+  }
+
   const token = request.cookies.get(ACCESS_TOKEN_COOKIE)?.value;
   const isAuthenticated = !!token && !isJwtExpired(token);
   const isPublicRoute = PUBLIC_ROUTES.includes(pathname);
