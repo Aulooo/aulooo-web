@@ -18,16 +18,28 @@ chamada — os componentes não mudam.
 
 ## `mock/`
 
-| Arquivo | Conteúdo |
-| --- | --- |
-| `session.ts` | Usuário da sessão por papel + `getMockSession()` (server-side, lê o cookie) |
-| `role-cookie.ts` | Nome do cookie e `resolveMockRole()` — **sem imports de servidor**, usável no client |
-| `students.ts` · `payments.ts` · `documents.ts` · `announcements.ts` · `schedule.ts` · `teachers.ts` | Dados **estáticos** de cada domínio (alimentam as homes) |
-| `people-store.ts` + `people.data.json` + `people-seed.ts` | "Banco" **mutável** de pessoas (cadastro em `/usuarios`) — ver abaixo |
-| `_helpers.ts` | Datas relativas a "agora" (o mock nunca envelhece) |
+```
+mock/
+  session.ts        usuário da sessão por papel + getMockSession() (lê o cookie)
+  role-cookie.ts    nome do cookie + resolveMockRole() — sem imports de servidor (usável no client)
+  _helpers.ts       datas relativas a "agora" (o mock nunca envelhece)
+  students.ts       dados brutos de aluno   ─┐  fontes do seed
+  teachers.ts       dados brutos de professor ┘
+  json-store.ts     factory jsonStore<T>(nome, seed) — CRUD sobre um arquivo JSON
+  db/
+    seed-data.ts    seeds de todas as coleções (a partir de students/teachers)
+    people.ts · lessons.ts · announcements.ts · documents.ts · payments.ts
+    data/           <- os JSON de verdade (gitignored, recriados do seed)
+```
 
-Os IDs são consistentes entre arquivos (ex.: `teacherId: "usr_prof"` = `MOCK_USERS.professor.id`;
-o aluno `usr_aluno` é o "eu" da home do aluno).
+- **Uma coleção = um arquivo `mock/data/<nome>.json`.** O primeiro acesso cria o arquivo
+  a partir do seed. Para resetar tudo: `rm -rf mock/data`.
+- Cada `mock/db/<x>.ts` expõe uma interface parecida com um CRUD REST
+  (`list / get / where / insert / patch / remove` + helpers de domínio). É `server-only`.
+- IDs são consistentes: `usr_prof` = professor da sessão, `usr_aluno` = "eu" da home do
+  aluno, `usr_admin` = admin. `studentProfile.teacherId` é o vínculo aluno↔professor.
+- O contrato de API que tudo isso assume está em
+  [`api-contract-assumptions.md`](./api-contract-assumptions.md).
 
 ## Sessão e papéis
 
@@ -63,25 +75,28 @@ features/home/lib/professor-home.ts  →  getProfessorHomeData(teacherId, firstN
 Quando houver API, essa função passa a compor chamadas de `features/<x>/api/` em vez de ler
 o mock. A assinatura e o tipo de retorno continuam iguais.
 
-## Store mutável (cadastro de pessoas)
+## Escrita: Server Actions + store
 
-Telas que **escrevem** dados (hoje só `/usuarios`) usam um "banco" JSON local:
+Toda tela que grava (pessoas, avisos, agenda, materiais, pagar) segue o mesmo padrão:
 
-- `mock/people-store.ts` — `list / get / findByEmail / create / update / setActive`.
-  Lê e grava `mock/people.data.json` com `fs`. É `server-only`.
-- `mock/people.data.json` — **gitignored** (`/mock/*.data.json`). Sandbox local de cada dev;
-  recriado a partir de `people-seed.ts` (alunos + professores existentes) na primeira leitura.
-- As Server Actions (`features/people/actions/*`) chamam só o `peopleStore` e fazem
-  `revalidatePath("/usuarios")`. O formulário usa `useActionState`.
+```
+features/<x>/actions/<verbo>-<x>.ts   "use server" → valida (zod) → mock/db/<x> → revalidatePath()
+features/<x>/components/<X>FormSheet   useActionState(action[, .bind(null, id)]) + <FormSheet>
+```
 
-Para produção: criar `features/people/api/people-api.ts` (via `apiClient`) e trocar
-`peopleStore` por ele **nas actions** — a assinatura das actions e o formulário não mudam.
+- Retorno padrão das actions: `ActionState` (`shared/lib/action-state.ts`) — `{ ok, message?, errors? }`.
+- `revalidatePath` faz o Server Component da rota re-buscar e a lista atualizar sozinha.
+- O `authorId`/`teacherId`/`personId` do usuário atual é fixado com `action.bind(null, id)`
+  no client (o client não é fonte de verdade de identidade).
 
 ## Trocando mock por API (checklist futuro)
 
-1. Criar `features/<x>/api/<x>-api.ts` usando `apiClient` de `core/http`.
-2. Ajustar o `types.ts` da feature ao contrato real do back-end.
-3. Trocar os imports de `@/mock/<x>` pelas chamadas de API (Server Components podem
-   `await` direto; client usa hook/estado).
-4. Remover o arquivo `mock/<x>.ts`.
-5. Quando todos os mocks saírem: remover o bypass do `proxy.ts`, o `features/dev` e o `mock/`.
+Ver **[`api-contract-assumptions.md`](./api-contract-assumptions.md)** para o payload esperado
+de cada recurso. Por recurso:
+
+1. Ajustar `features/<x>/types.ts` ao payload real do back-end.
+2. Criar `features/<x>/api/<x>-api.ts` usando `apiClient` de `core/http`.
+3. Trocar `@/mock/db/<x>` pela `api/` **nas actions e nos `page.tsx`**. As actions e os
+   formulários (`useActionState`, `<FormSheet>`) não mudam de forma.
+4. Apagar `mock/db/<x>.ts` e o seed correspondente em `seed-data.ts`.
+5. No fim: remover o bypass do `proxy.ts`, `features/dev/` e `mock/`.
