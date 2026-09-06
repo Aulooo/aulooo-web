@@ -13,9 +13,9 @@ import {
 } from "@/shared/components/ui/sheet";
 import { savePerson } from "../actions/save-person";
 import type { PersonActionState, PersonRole } from "../types";
-import { Field } from "./Field";
+import { Field } from "@/shared/components/form/Field";
 import { RoleCheckboxes } from "./RoleCheckboxes";
-import { SelectField } from "./SelectField";
+import { SelectField } from "@/shared/components/form/SelectField";
 import type { PersonFormSheetProps } from "./PersonFormSheet.types";
 
 const INITIAL: PersonActionState = { ok: false };
@@ -33,10 +33,19 @@ function Legend({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function PersonFormSheet({ person, professors, onClose }: PersonFormSheetProps) {
+export function PersonFormSheet({
+  person,
+  professors,
+  lockRoleAluno = false,
+  fixedTeacherId,
+  onClose,
+}: PersonFormSheetProps) {
   const [state, formAction, pending] = useActionState(savePerson, INITIAL);
-  const [roles, setRoles] = useState<PersonRole[]>(person?.roles ?? []);
+  const [roles, setRoles] = useState<PersonRole[]>(
+    lockRoleAluno ? ["aluno"] : person?.roles ?? [],
+  );
   const isEdit = Boolean(person);
+  const noun = lockRoleAluno ? "aluno" : "pessoa";
 
   useEffect(() => {
     if (state.ok) onClose();
@@ -51,15 +60,23 @@ export function PersonFormSheet({ person, professors, onClose }: PersonFormSheet
     <Sheet open onOpenChange={(open) => !open && onClose()}>
       <SheetContent side="right" className="w-full gap-0 p-0 sm:max-w-lg">
         <SheetHeader className="border-b border-border">
-          <SheetTitle>{isEdit ? "Editar pessoa" : "Nova pessoa"}</SheetTitle>
+          <SheetTitle>
+            {isEdit ? `Editar ${noun}` : `Novo ${noun}`}
+          </SheetTitle>
           <SheetDescription>
-            {isEdit ? person?.name : "Cadastre alguém no Studio Alves."}
+            {isEdit
+              ? person?.name
+              : lockRoleAluno
+                ? "O aluno fica vinculado a você."
+                : "Cadastre alguém no Studio Alves."}
           </SheetDescription>
         </SheetHeader>
 
         <form action={formAction} className="flex min-h-0 flex-1 flex-col">
           <div className="flex-1 space-y-6 overflow-y-auto p-4">
             {isEdit && person ? <input type="hidden" name="id" value={person.id} /> : null}
+            {lockRoleAluno ? <input type="hidden" name="roles" value="aluno" /> : null}
+            {fixedTeacherId ? <input type="hidden" name="teacherId" value={fixedTeacherId} /> : null}
 
             <fieldset>
               <Legend>Dados pessoais</Legend>
@@ -74,10 +91,12 @@ export function PersonFormSheet({ person, professors, onClose }: PersonFormSheet
               </div>
             </fieldset>
 
-            <fieldset>
-              <Legend>Perfil no Studio Alves</Legend>
-              <RoleCheckboxes value={roles} onChange={setRoles} error={state.errors?.roles} />
-            </fieldset>
+            {!lockRoleAluno ? (
+              <fieldset>
+                <Legend>Perfil no Studio Alves</Legend>
+                <RoleCheckboxes value={roles} onChange={setRoles} error={state.errors?.roles} />
+              </fieldset>
+            ) : null}
 
             {roles.includes("aluno") ? (
               <fieldset>
@@ -101,12 +120,14 @@ export function PersonFormSheet({ person, professors, onClose }: PersonFormSheet
                       error={state.errors?.["studentProfile.dueDay"]}
                     />
                   </div>
-                  <SelectField
-                    label="Professor responsável"
-                    name="teacherId"
-                    options={teacherOptions}
-                    defaultValue={person?.studentProfile?.teacherId ?? "none"}
-                  />
+                  {!fixedTeacherId ? (
+                    <SelectField
+                      label="Professor responsável"
+                      name="teacherId"
+                      options={teacherOptions}
+                      defaultValue={person?.studentProfile?.teacherId ?? "none"}
+                    />
+                  ) : null}
                 </div>
               </fieldset>
             ) : null}
