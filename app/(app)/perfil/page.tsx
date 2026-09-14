@@ -1,12 +1,8 @@
-import { notFound } from "next/navigation";
-import { ProfileView } from "@/features/profile";
-import { getMockSession } from "@/mock/session";
-import { peopleDb } from "@/mock/db/people";
+import { ProfileView, getCurrentProfile, getMyBranding } from "@/features/profile";
 
 export default async function PerfilPage() {
-  const user = await getMockSession();
-  const person = await peopleDb.get(user.id);
-  if (!person) notFound();
+  const profile = await getCurrentProfile();
+  const branding = profile.role === "professor" ? await getMyBranding() : null;
 
-  return <ProfileView person={person} />;
+  return <ProfileView profile={profile} branding={branding} />;
 }

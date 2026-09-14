@@ -1,5 +1,6 @@
-import type { Person } from "@/features/people";
+import type { ProfessorBranding, Profile } from "../types";
 
 export type ProfileViewProps = {
-  person: Person;
+  profile: Profile;
+  branding: ProfessorBranding | null;
 };

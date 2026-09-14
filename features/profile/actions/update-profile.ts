@@ -1,37 +1,63 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { envelopeFieldErrors } from "@/core/http/api-client";
 import type { ActionState } from "@/shared/lib/action-state";
 import { zodErrorsToRecord } from "@/shared/lib/action-state";
-import { peopleDb } from "@/mock/db/people";
-import { profileInputSchema } from "../lib/profile-schema";
+import { profileApi } from "../api/profile-api";
+import { professorProfileInputSchema, studentProfileInputSchema } from "../lib/profile-schema";
+import type { ProfileRole } from "../types";
 
-/** personId é fixado via .bind(null, personId) no client. */
+/** role/currentEmail são fixados via .bind(null, role, currentEmail) no client. */
 export async function updateProfile(
-  personId: string,
+  role: ProfileRole,
+  currentEmail: string,
   _prev: ActionState,
   formData: FormData,
 ): Promise<ActionState> {
-  const parsed = profileInputSchema.safeParse({
+  const raw = {
     name: String(formData.get("name") ?? ""),
+    email: String(formData.get("email") ?? ""),
     phone: String(formData.get("phone") ?? ""),
-    specialty: String(formData.get("specialty") ?? ""),
-  });
+    dateOfBirth: String(formData.get("dateOfBirth") ?? ""),
+    ...(role === "professor"
+      ? {
+          professionalRegistration: String(formData.get("professionalRegistration") ?? ""),
+          professionalDescription: String(formData.get("professionalDescription") ?? ""),
+        }
+      : { objective: String(formData.get("objective") ?? "") }),
+  };
+
+  const parsed =
+    role === "professor"
+      ? professorProfileInputSchema.safeParse(raw)
+      : studentProfileInputSchema.safeParse(raw);
 
   if (!parsed.success) {
     return { ok: false, message: "Confira os campos.", errors: zodErrorsToRecord(parsed.error.issues) };
   }
 
-  const current = await peopleDb.get(personId);
-  if (!current) return { ok: false, message: "Perfil não encontrado." };
+  const { email, ...profileInput } = parsed.data;
 
-  await peopleDb.patch(personId, {
-    name: parsed.data.name,
-    phone: parsed.data.phone,
-    teacherProfile: current.roles.includes("professor")
-      ? { specialty: parsed.data.specialty }
-      : current.teacherProfile,
-  });
+  const profileResult =
+    role === "professor"
+      ? await profileApi.updateProfessorProfile(profileInput)
+      : await profileApi.updateStudentProfile(profileInput);
+
+  if (profileResult.code !== 1) {
+    return {
+      ok: false,
+      message: profileResult.message,
+      errors: envelopeFieldErrors(profileResult),
+    };
+  }
+
+  if (email !== currentEmail) {
+    const emailResult = await profileApi.updateEmail(email);
+    if (emailResult.code !== 1) {
+      return { ok: false, message: emailResult.message, errors: envelopeFieldErrors(emailResult) };
+    }
+  }
 
   revalidatePath("/perfil");
   revalidatePath("/home");
