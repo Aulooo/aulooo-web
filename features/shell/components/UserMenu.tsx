@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { LogOut, Settings, UserRound } from "lucide-react";
+import { signOut } from "@/features/auth/actions/sign-out";
 import { initials } from "@/shared/lib/initials";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import {
@@ -54,10 +55,12 @@ export function UserMenu({ user, align = "end", side = "bottom" }: UserMenuProps
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" asChild>
-          <Link href="/sign-in">
-            <LogOut />
-            Sair
-          </Link>
+          <form action={signOut} className="w-full">
+            <button type="submit" className="flex w-full items-center gap-1.5">
+              <LogOut />
+              Sair
+            </button>
+          </form>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

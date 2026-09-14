@@ -3,8 +3,8 @@ export type SignInCredentials = {
   password: string;
 };
 
-/** Papéis de acesso. Virá de uma tabela de roles (usuário ↔ role) no backend. */
-export type Role = "admin" | "professor" | "aluno";
+/** Papéis de acesso. Não existe administrador funcional no MVP do backend. */
+export type Role = "professor" | "aluno";
 
 /** Usuário da sessão atual, já com o papel resolvido para o tenant ativo. */
 export type SessionUser = {
@@ -17,14 +17,40 @@ export type SessionUser = {
   tenantName: string;
 };
 
+/** Role como a API real devolve (case do backend — distinto do `Role` mockado da UI). */
+export type ApiRole = "Professor" | "Aluno";
+
+/** `data` de AuthResponse (`POST /auth/sign-in`, `/auth/sign-up/*`). */
 export type AuthenticatedUser = {
-  code: number;
-  message: string;
-  data?: {
-    token: string;
-    user: {
-      name: string;
-      email: string;
-    }
-  }
+  accessToken: string;
+  tokenType: string;
+  expiresAt?: string;
+  user: {
+    userId: string;
+    email: string;
+    role: ApiRole;
+  };
+  profile: Record<string, unknown>;
+};
+
+export type ProfessorSignUpInput = {
+  name: string;
+  cpf: string;
+  email: string;
+  password: string;
+  phone?: string;
+  dateOfBirth?: string;
+  professionalRegistration: string;
+  professionalDescription?: string;
+};
+
+export type StudentSignUpInput = {
+  entryCode: string;
+  name: string;
+  cpf: string;
+  email: string;
+  password: string;
+  phone?: string;
+  dateOfBirth?: string;
+  objective?: string;
 };

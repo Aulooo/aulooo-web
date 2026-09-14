@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { Bell } from "lucide-react";
 import { Logo } from "@/shared/brand/Logo";
-import { Button } from "@/shared/components/ui/button";
+import { NotificationBell } from "@/features/notifications";
 import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu } from "./UserMenu";
 import type { AppHeaderProps } from "./AppHeader.types";
@@ -26,9 +25,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
         <div className="flex shrink-0 items-center gap-0.5">
           <ThemeToggle />
-          <Button variant="ghost" size="icon" aria-label="Notificações">
-            <Bell />
-          </Button>
+          <NotificationBell role={user.role} />
           <UserMenu user={user} />
         </div>
       </div>
