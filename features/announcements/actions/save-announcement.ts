@@ -1,43 +1,32 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { envelopeFieldErrors } from "@/core/http/api-client";
 import type { ActionState } from "@/shared/lib/action-state";
 import { zodErrorsToRecord } from "@/shared/lib/action-state";
-import { announcementsDb } from "@/mock/db/announcements";
+import { announcementsApi } from "../api/announcements-api";
 import { announcementInputSchema } from "../lib/announcement-schema";
-import type { AnnouncementInput } from "../types";
 
-function buildInput(formData: FormData) {
-  const audience = String(formData.get("audience") ?? "all");
-  return {
-    title: String(formData.get("title") ?? ""),
-    body: String(formData.get("body") ?? ""),
-    audience,
-    studentId: audience === "student" && formData.get("studentId") ? String(formData.get("studentId")) : null,
-    pinned: formData.get("pinned") === "on",
-  };
-}
-
-/** authorId é fixado via .bind(null, authorId) no client. */
-export async function saveAnnouncement(
-  authorId: string,
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
+export async function saveAnnouncement(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const id = formData.get("id") ? String(formData.get("id")) : null;
-  const parsed = announcementInputSchema.safeParse(buildInput(formData));
+  const parsed = announcementInputSchema.safeParse({
+    title: String(formData.get("title") ?? ""),
+    content: String(formData.get("content") ?? ""),
+  });
 
   if (!parsed.success) {
     return { ok: false, message: "Confira os campos.", errors: zodErrorsToRecord(parsed.error.issues) };
   }
 
-  const input = parsed.data as AnnouncementInput;
-  const saved = id
-    ? await announcementsDb.update(id, input)
-    : await announcementsDb.create(authorId, input);
-  if (!saved) return { ok: false, message: "Aviso não encontrado." };
+  const result = id
+    ? await announcementsApi.update(id, parsed.data)
+    : await announcementsApi.create(parsed.data);
+
+  if (result.code !== 1) {
+    return { ok: false, message: result.message, errors: envelopeFieldErrors(result) };
+  }
 
   revalidatePath("/avisos");
   revalidatePath("/home");
-  return { ok: true, id: saved.id, message: id ? "Aviso atualizado." : "Aviso publicado." };
+  return { ok: true, id: result.data?.id, message: id ? "Aviso atualizado." : "Aviso publicado." };
 }
