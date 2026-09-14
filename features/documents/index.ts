@@ -1,2 +1,3 @@
 export { MateriaisView } from "./components/MateriaisView";
-export type { StudyDocument, DocumentKind, DocumentAudience, DocumentInput } from "./types";
+export { getMaterialsForStudent, getMyMaterialsAsStudent } from "./lib/get-my-materials";
+export type { StudyDocument } from "./types";
