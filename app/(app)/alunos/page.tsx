@@ -1,13 +1,12 @@
 import { redirect } from "next/navigation";
-import { PeopleView } from "@/features/people";
-import { getMockSession } from "@/mock/session";
-import { peopleDb } from "@/mock/db/people";
+import { StudentsView, getMyStudents } from "@/features/students";
+import { getCurrentProfile } from "@/features/profile";
 
 export default async function AlunosPage() {
-  const user = await getMockSession();
-  if (user.role !== "professor") redirect("/home");
+  const profile = await getCurrentProfile();
+  if (profile.role !== "professor") redirect("/home");
 
-  const people = await peopleDb.list();
+  const students = await getMyStudents();
 
-  return <PeopleView people={people} scope="my-students" currentUser={user} />;
+  return <StudentsView students={students} />;
 }
