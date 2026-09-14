@@ -1,43 +1,56 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { envelopeFieldErrors } from "@/core/http/api-client";
 import type { ActionState } from "@/shared/lib/action-state";
 import { zodErrorsToRecord } from "@/shared/lib/action-state";
-import { lessonsDb } from "@/mock/db/lessons";
-import { lessonInputSchema } from "../lib/lesson-schema";
-import type { LessonInput } from "../types";
+import { scheduleApi } from "../api/schedule-api";
+import { createClassInputSchema, createSeriesInputSchema } from "../lib/lesson-schema";
 
-function buildInput(formData: FormData) {
-  const raw = String(formData.get("startsAt") ?? "");
-  const studentId = String(formData.get("studentId") ?? "");
-  return {
-    title: String(formData.get("title") ?? ""),
-    startsAt: raw ? new Date(raw).toISOString() : "",
-    durationMin: Number.parseInt(String(formData.get("durationMin") ?? ""), 10),
-    mode: String(formData.get("mode") ?? "in_person"),
-    location: String(formData.get("location") ?? "").trim() || null,
-    studentId: studentId && studentId !== "turma" ? studentId : null,
-  };
-}
+export async function createLesson(_prev: ActionState, formData: FormData): Promise<ActionState> {
+  const kind = String(formData.get("kind") ?? "single");
 
-/** teacherId é fixado via .bind(null, teacherId) no client. */
-export async function saveLesson(
-  teacherId: string,
-  _prev: ActionState,
-  formData: FormData,
-): Promise<ActionState> {
-  const id = formData.get("id") ? String(formData.get("id")) : null;
-  const parsed = lessonInputSchema.safeParse(buildInput(formData));
+  if (kind === "series") {
+    const parsed = createSeriesInputSchema.safeParse({
+      studentId: String(formData.get("studentId") ?? ""),
+      dayOfWeek: String(formData.get("dayOfWeek") ?? ""),
+      startTime: String(formData.get("startTime") ?? ""),
+      endTime: String(formData.get("endTime") ?? ""),
+      startDate: String(formData.get("startDate") ?? ""),
+      endDate: String(formData.get("endDate") ?? ""),
+    });
+
+    if (!parsed.success) {
+      return { ok: false, message: "Confira os campos.", errors: zodErrorsToRecord(parsed.error.issues) };
+    }
+
+    const result = await scheduleApi.createSeries(parsed.data);
+    if (result.code !== 1) {
+      return { ok: false, message: result.message, errors: envelopeFieldErrors(result) };
+    }
+
+    revalidatePath("/agenda");
+    revalidatePath("/home");
+    return { ok: true, message: "Série agendada." };
+  }
+
+  const parsed = createClassInputSchema.safeParse({
+    studentId: String(formData.get("studentId") ?? ""),
+    date: String(formData.get("date") ?? ""),
+    startTime: String(formData.get("startTime") ?? ""),
+    endTime: String(formData.get("endTime") ?? ""),
+  });
 
   if (!parsed.success) {
     return { ok: false, message: "Confira os campos.", errors: zodErrorsToRecord(parsed.error.issues) };
   }
 
-  const input = parsed.data as LessonInput;
-  const saved = id ? await lessonsDb.update(id, input) : await lessonsDb.create(teacherId, input);
-  if (!saved) return { ok: false, message: "Aula não encontrada." };
+  const result = await scheduleApi.createClass(parsed.data);
+  if (result.code !== 1) {
+    return { ok: false, message: result.message, errors: envelopeFieldErrors(result) };
+  }
 
   revalidatePath("/agenda");
   revalidatePath("/home");
-  return { ok: true, id: saved.id, message: id ? "Aula atualizada." : "Aula agendada." };
+  return { ok: true, id: result.data?.id, message: "Aula agendada." };
 }

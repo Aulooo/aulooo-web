@@ -1,28 +1,37 @@
-export type LessonMode = "in_person" | "online";
+/**
+ * 0 = domingo … 6 = sábado (convenção de `Date#getDay()`). O exemplo do contrato
+ * mostra `"Tuesday"` como string, mas a API real só aceita o índice numérico —
+ * confirmado testando contra o backend local.
+ */
+export type WeekDay = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-export type LessonStatus = "scheduled" | "done" | "canceled";
-
-export type Lesson = {
+/** Uma ocorrência de aula (avulsa ou materializada de uma série). */
+export type LessonClass = {
   id: string;
-  title: string;
+  studentId: string | null;
+  seriesId: string | null;
   startsAt: string;
-  durationMin: number;
-  mode: LessonMode;
-  /** Sala física ou link da chamada. */
-  location?: string | null;
-  teacherId: string;
-  /** null = aula em grupo/turma. */
-  studentId?: string | null;
-  status: LessonStatus;
-  createdAt: string;
+  endsAt: string;
+  status: string;
+  cancellationReason?: string | null;
 };
 
-/** O que a Server Action recebe para agendar/editar uma aula. */
-export type LessonInput = {
-  title: string;
-  startsAt: string;
-  durationMin: number;
-  mode: LessonMode;
-  location?: string | null;
-  studentId: string | null;
+export type CreateClassInput = {
+  studentId: string;
+  /** YYYY-MM-DD */
+  date: string;
+  /** HH:mm */
+  startTime: string;
+  /** HH:mm */
+  endTime: string;
+};
+
+export type CreateSeriesInput = {
+  studentId: string;
+  /** 0-6, ver `WeekDay`. */
+  dayOfWeek: number;
+  startTime: string;
+  endTime: string;
+  startDate: string;
+  endDate: string;
 };

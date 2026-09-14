@@ -5,96 +5,88 @@ import { Field } from "@/shared/components/form/Field";
 import { FormSheet } from "@/shared/components/form/FormSheet";
 import { SelectField } from "@/shared/components/form/SelectField";
 import { IDLE_ACTION_STATE } from "@/shared/lib/action-state";
-import { saveLesson } from "../actions/save-lesson";
-import type { LessonMode } from "../types";
+import { WEEKDAYS, WEEKDAY_LABEL } from "@/shared/lib/weekday";
+import { createLesson } from "../actions/create-lesson";
 import type { LessonFormSheetProps } from "./LessonFormSheet.types";
 
-const DURATIONS = [30, 45, 60, 90, 120];
-
-function isoToLocalInput(iso: string): string {
-  const d = new Date(iso);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-export function LessonFormSheet({ lesson, teacherId, students, onClose }: LessonFormSheetProps) {
-  const [state, formAction, pending] = useActionState(
-    saveLesson.bind(null, teacherId),
-    IDLE_ACTION_STATE,
-  );
-  const [mode, setMode] = useState<LessonMode>(lesson?.mode ?? "in_person");
-  const isEdit = Boolean(lesson);
+export function LessonFormSheet({ students, onClose }: LessonFormSheetProps) {
+  const [state, formAction, pending] = useActionState(createLesson, IDLE_ACTION_STATE);
+  const [kind, setKind] = useState<"single" | "series">("single");
 
   useEffect(() => {
     if (state.ok) onClose();
   }, [state.ok, onClose]);
 
+  const studentOptions = students.map((s) => ({ value: s.id, label: s.name }));
+
   return (
     <FormSheet
-      title={isEdit ? "Editar aula" : "Nova aula"}
-      submitLabel={isEdit ? "Salvar" : "Agendar"}
+      title="Nova aula"
+      submitLabel={kind === "series" ? "Agendar série" : "Agendar"}
       pending={pending}
       formAction={formAction}
       error={!state.ok ? state.message : undefined}
       onClose={onClose}
     >
-      {isEdit && lesson ? <input type="hidden" name="id" value={lesson.id} /> : null}
+      <input type="hidden" name="kind" value={kind} />
 
-      <Field
-        label="Título"
-        name="title"
-        defaultValue={lesson?.title}
-        error={state.errors?.title}
-        placeholder="Treino, aula, consultoria…"
-        required
-      />
+      <fieldset className="space-y-2">
+        <legend className="text-sm font-medium text-foreground">Repetição</legend>
+        <label className="flex items-center gap-2 text-sm text-foreground">
+          <input
+            type="radio"
+            checked={kind === "single"}
+            onChange={() => setKind("single")}
+            className="size-4 accent-primary"
+          />
+          Aula única
+        </label>
+        <label className="flex items-center gap-2 text-sm text-foreground">
+          <input
+            type="radio"
+            checked={kind === "series"}
+            onChange={() => setKind("series")}
+            className="size-4 accent-primary"
+          />
+          Recorrente até uma data
+        </label>
+      </fieldset>
 
       <SelectField
         label="Aluno"
         name="studentId"
-        options={[
-          { value: "turma", label: "Turma / grupo" },
-          ...students.map((s) => ({ value: s.id, label: s.name })),
-        ]}
-        defaultValue={lesson?.studentId ?? "turma"}
+        options={studentOptions}
+        error={state.errors?.studentId}
+        placeholder="Escolha o aluno"
+        required
       />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Field
-          label="Data e hora"
-          name="startsAt"
-          type="datetime-local"
-          defaultValue={lesson ? isoToLocalInput(lesson.startsAt) : undefined}
-          error={state.errors?.startsAt}
-          required
-        />
-        <SelectField
-          label="Duração"
-          name="durationMin"
-          options={DURATIONS.map((d) => ({ value: String(d), label: `${d} min` }))}
-          defaultValue={String(lesson?.durationMin ?? 60)}
-          error={state.errors?.durationMin}
-        />
-      </div>
-
-      <fieldset className="space-y-2">
-        <legend className="text-sm font-medium text-foreground">Formato</legend>
-        <label className="flex items-center gap-2 text-sm text-foreground">
-          <input type="radio" name="mode" value="in_person" checked={mode === "in_person"} onChange={() => setMode("in_person")} className="size-4 accent-primary" />
-          Presencial
-        </label>
-        <label className="flex items-center gap-2 text-sm text-foreground">
-          <input type="radio" name="mode" value="online" checked={mode === "online"} onChange={() => setMode("online")} className="size-4 accent-primary" />
-          Online
-        </label>
-      </fieldset>
-
-      <Field
-        label={mode === "online" ? "Link da chamada" : "Local / sala"}
-        name="location"
-        defaultValue={lesson?.location ?? ""}
-        placeholder={mode === "online" ? "https://meet.google.com/…" : "Sala 2"}
-      />
+      {kind === "single" ? (
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field label="Data" name="date" type="date" error={state.errors?.date} required />
+          <Field label="Início" name="startTime" type="time" error={state.errors?.startTime} required />
+          <Field label="Fim" name="endTime" type="time" error={state.errors?.endTime} required />
+        </div>
+      ) : (
+        <>
+          <SelectField
+            label="Dia da semana"
+            name="dayOfWeek"
+            options={WEEKDAYS.map((d) => ({ value: String(d), label: WEEKDAY_LABEL[d] }))}
+            error={state.errors?.dayOfWeek}
+            placeholder="Escolha o dia"
+            required
+          />
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="Início" name="startTime" type="time" error={state.errors?.startTime} required />
+            <Field label="Fim" name="endTime" type="time" error={state.errors?.endTime} required />
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Field label="De" name="startDate" type="date" error={state.errors?.startDate} required />
+            <Field label="Até" name="endDate" type="date" error={state.errors?.endDate} required />
+          </div>
+        </>
+      )}
     </FormSheet>
   );
 }

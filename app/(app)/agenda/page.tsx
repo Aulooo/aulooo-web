@@ -1,38 +1,28 @@
-import { redirect } from "next/navigation";
-import { AgendaView } from "@/features/schedule";
-import { getMockSession } from "@/mock/session";
-import { lessonsDb } from "@/mock/db/lessons";
-import { peopleDb } from "@/mock/db/people";
+import { AgendaView, defaultAgendaRange, getMyClasses } from "@/features/schedule";
+import { getMyStudents } from "@/features/students";
+import { getCurrentProfile } from "@/features/profile";
+import { getMyRequests } from "@/features/rescheduling";
 
 export default async function AgendaPage() {
-  const user = await getMockSession();
-  if (user.role === "admin") redirect("/home");
+  const profile = await getCurrentProfile();
+  const { from, to } = defaultAgendaRange();
+  const lessons = await getMyClasses(profile.role, from, to);
 
-  if (user.role === "aluno") {
-    const lessons = await lessonsDb.forStudent(user.id);
+  if (profile.role === "aluno") {
+    const myRequests = await getMyRequests("aluno");
     return (
-      <AgendaView
-        lessons={lessons}
-        mode="read"
-        teacherId=""
-        students={[]}
-        studentNameById={{}}
-      />
+      <AgendaView lessons={lessons} mode="read" students={[]} studentNameById={{}} myRequests={myRequests} />
     );
   }
 
-  const [lessons, students] = await Promise.all([
-    lessonsDb.forTeacher(user.id),
-    peopleDb.students(user.id),
-  ]);
+  const students = await getMyStudents();
 
   return (
     <AgendaView
       lessons={lessons}
       mode="manage"
-      teacherId={user.id}
-      students={students.map((s) => ({ id: s.id, name: s.name }))}
-      studentNameById={Object.fromEntries(students.map((s) => [s.id, s.name]))}
+      students={students.map((s) => ({ id: s.studentId, name: s.name }))}
+      studentNameById={Object.fromEntries(students.map((s) => [s.studentId, s.name]))}
     />
   );
 }

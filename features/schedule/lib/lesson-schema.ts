@@ -1,13 +1,28 @@
 import * as z from "zod";
 
-export const lessonInputSchema = z.object({
-  title: z.string().trim().min(2, "Informe um título").max(120),
-  startsAt: z
-    .string()
-    .trim()
-    .refine((v) => v !== "" && !Number.isNaN(Date.parse(v)), "Data e hora inválidas"),
-  durationMin: z.number().int().min(15, "Mínimo 15 min").max(240, "Máximo 4 h"),
-  mode: z.enum(["in_person", "online"]),
-  location: z.string().trim().max(200).nullable(),
-  studentId: z.string().nullable(),
-});
+const TIME_REGEX = /^([01]\d|2[0-3]):[0-5]\d$/;
+const timeField = z.string().regex(TIME_REGEX, "Horário inválido");
+
+export const createClassInputSchema = z
+  .object({
+    studentId: z.string().min(1, "Escolha o aluno"),
+    date: z.string().min(1, "Escolha a data"),
+    startTime: timeField,
+    endTime: timeField,
+  })
+  .refine((v) => v.startTime < v.endTime, { message: "O fim deve ser depois do início", path: ["endTime"] });
+
+export const createSeriesInputSchema = z
+  .object({
+    studentId: z.string().min(1, "Escolha o aluno"),
+    dayOfWeek: z.coerce.number().int().min(0, "Escolha o dia").max(6, "Escolha o dia"),
+    startTime: timeField,
+    endTime: timeField,
+    startDate: z.string().min(1, "Escolha a data inicial"),
+    endDate: z.string().min(1, "Escolha a data final"),
+  })
+  .refine((v) => v.startTime < v.endTime, { message: "O fim deve ser depois do início", path: ["endTime"] })
+  .refine((v) => v.startDate <= v.endDate, {
+    message: "Deve ser igual ou posterior à data inicial",
+    path: ["endDate"],
+  });
