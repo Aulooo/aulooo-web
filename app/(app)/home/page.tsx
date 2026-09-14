@@ -1,8 +1,8 @@
 import { HomeScreen } from "@/features/home";
-import { getMockSession } from "@/mock/session";
+import { getCurrentProfile, toSessionUser } from "@/features/profile";
 
 export default async function HomePage() {
-  const user = await getMockSession();
+  const profile = await getCurrentProfile();
 
-  return <HomeScreen user={user} />;
+  return <HomeScreen user={toSessionUser(profile)} />;
 }

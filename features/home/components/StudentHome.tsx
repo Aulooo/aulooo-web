@@ -3,22 +3,18 @@ import { getStudentHomeData } from "../lib/student-home";
 import { AnnouncementList } from "./AnnouncementList";
 import { DocumentList } from "./DocumentList";
 import { HomeGreeting } from "./HomeGreeting";
-import { MensalidadeCard } from "./MensalidadeCard";
 import { NextLessonCard } from "./NextLessonCard";
 import { SeeAllLink } from "./SeeAllLink";
 import type { HomeScreenProps } from "./home-screen-props";
 
 export async function StudentHome({ user }: HomeScreenProps) {
-  const data = await getStudentHomeData(user.id, user.name.split(" ")[0]);
+  const data = await getStudentHomeData(user.name.split(" ")[0]);
 
   return (
     <div className="space-y-6">
       <HomeGreeting name={data.firstName} subtitle="Bom te ver por aqui." />
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <NextLessonCard lesson={data.nextLesson} />
-        <MensalidadeCard payment={data.currentPayment} />
-      </div>
+      <NextLessonCard lesson={data.nextLesson} />
 
       <div className="grid gap-6 lg:grid-cols-2 lg:items-start">
         <section className="space-y-3">
