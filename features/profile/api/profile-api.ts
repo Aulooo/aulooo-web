@@ -9,13 +9,21 @@ import type {
   UpdateStudentProfileInput,
 } from "../types";
 
+/** `data` de `GET /public/professors/by-slug/:slug` — sem autenticação. */
+export type PublicProfessorBranding = {
+  professorId: string;
+  name: string;
+  brandColor: string | null;
+  hasBanner: boolean;
+};
+
 /** `data` de `GET /auth/me` (AUTH-04) — usado só pra resolver o papel do usuário logado. */
 export type CurrentUser = {
   userId: string;
   email: string;
   role: ApiRole;
   accountStatus: string;
-  profileId: string;
+  profileId: string | null;
   profileSummary: unknown;
 };
 
@@ -24,6 +32,9 @@ type RawStudentProfile = Omit<StudentProfile, "role">;
 
 export const profileApi = {
   getCurrentUser: () => apiClient.get<CurrentUser>("/auth/me"),
+
+  getPublicProfessorBySlug: (slug: string) =>
+    apiClient.get<PublicProfessorBranding>(`/public/professors/by-slug/${slug}`),
 
   getProfessorProfile: () => apiClient.get<RawProfessorProfile>("/professors/me"),
   updateProfessorProfile: (input: UpdateProfessorProfileInput) =>

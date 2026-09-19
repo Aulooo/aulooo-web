@@ -10,6 +10,7 @@ import { signUpProfessorSchema } from "../validator/sign-up-professor-validator"
 
 export async function signUpProfessor(_prev: ActionState, formData: FormData): Promise<ActionState> {
   const parsed = signUpProfessorSchema.safeParse({
+    entryCode: String(formData.get("entryCode") ?? ""),
     name: String(formData.get("name") ?? ""),
     cpf: String(formData.get("cpf") ?? ""),
     email: String(formData.get("email") ?? ""),

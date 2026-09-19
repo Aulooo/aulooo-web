@@ -19,6 +19,11 @@ export async function getCurrentProfile(): Promise<Profile> {
     return { role: "professor", ...res.data };
   }
 
+  if (me.data.role === "Admin") {
+    const summary = me.data.profileSummary as { name?: string } | null;
+    return { role: "admin", name: summary?.name ?? "Administrador", email: me.data.email };
+  }
+
   const res = await profileApi.getStudentProfile();
   if (res.code !== 1 || !res.data) {
     throw new Error(res.message || "Não foi possível carregar o perfil do aluno.");

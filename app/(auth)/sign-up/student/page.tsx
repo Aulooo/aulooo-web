@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SignUpStudentForm } from "@/features/auth";
+import { TenantBanner, getTenantBranding } from "@/features/profile";
 
 export default async function SignUpStudentPage({
   searchParams,
@@ -7,9 +8,11 @@ export default async function SignUpStudentPage({
   searchParams: Promise<{ code?: string }>;
 }) {
   const { code } = await searchParams;
+  const branding = await getTenantBranding();
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-16">
+      {branding ? <TenantBanner branding={branding} /> : null}
       <div className="w-full max-w-sm space-y-1 text-center">
         <h1 className="text-2xl font-semibold text-foreground">Criar conta de aluno</h1>
         <p className="text-sm text-muted-foreground">

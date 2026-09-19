@@ -13,9 +13,10 @@ import {
   DropdownMenuTrigger,
 } from "@/shared/components/ui/dropdown-menu";
 import { formatRelative } from "@/shared/lib/format";
-import type { Role } from "@/features/auth";
 import { getNotificationSignal } from "../actions/get-signal";
 import type { NotificationItem } from "../types";
+
+type NotifiableRole = "professor" | "aluno";
 
 const POLL_MS = 5000;
 const SINCE_KEY = "aulooo_notif_since";
@@ -25,7 +26,7 @@ const SINCE_KEY = "aulooo_notif_since";
  * derivado (avisos novos / decisões de reagendamento pro aluno, pedidos
  * pendentes pro professor) e compara com o último check salvo localmente.
  */
-export function NotificationBell({ role }: { role: Role }) {
+export function NotificationBell({ role }: { role: NotifiableRole }) {
   const [items, setItems] = useState<NotificationItem[]>([]);
   const [hasNew, setHasNew] = useState(false);
   const sinceRef = useRef<string | null>(null);

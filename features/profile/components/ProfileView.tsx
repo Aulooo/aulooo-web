@@ -79,7 +79,10 @@ export function ProfileView({ profile, branding }: ProfileViewProps) {
           <Row label="Telefone" value={profile.phone} />
           <Row label="CPF" value={profile.cpf} />
           {isProfessor ? (
-            <Row label="Registro profissional" value={profile.professionalRegistration} />
+            <>
+              <Row label="Registro profissional" value={profile.professionalRegistration} />
+              <Row label="Seu link" value={profile.slug ? `${profile.slug}.aulooo.com` : null} />
+            </>
           ) : (
             <Row label="Objetivo" value={profile.objective} />
           )}
@@ -102,7 +105,7 @@ export function ProfileView({ profile, branding }: ProfileViewProps) {
             <Compass className="size-4 text-muted-foreground" aria-hidden />
             Tour guiado
           </div>
-          <Button variant="secondary" size="sm" onClick={() => restartTour(profile.role, userId)}>
+          <Button variant="secondary" size="sm" onClick={() => restartTour()}>
             Rever
           </Button>
         </CardContent>
@@ -146,6 +149,15 @@ export function ProfileView({ profile, branding }: ProfileViewProps) {
                 defaultValue={profile.professionalDescription ?? ""}
                 error={state.errors?.professionalDescription}
                 placeholder="Especialidade, abordagem, experiência…"
+              />
+              <Field
+                label="Seu link (ex.: joao-silva.aulooo.com)"
+                name="slug"
+                defaultValue={profile.slug ?? ""}
+                placeholder="joao-silva"
+                className="[&_input]:lowercase"
+                error={state.errors?.slug}
+                required
               />
             </>
           ) : (

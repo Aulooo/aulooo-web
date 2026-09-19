@@ -3,6 +3,7 @@ import { Badge } from "@/shared/components/ui/badge";
 import { Card } from "@/shared/components/ui/card";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { formatDateTime } from "@/shared/lib/format";
+import { statusLabel } from "@/shared/lib/status-label";
 import { PolicyCard } from "./PolicyCard";
 import { RescheduleRequestRow } from "./RescheduleRequestRow";
 import type { ReschedulingPolicy, ReschedulingRequestItem } from "../types";
@@ -60,7 +61,7 @@ export function ReschedulingRequestsView({
                     </p>
                   </div>
                   <Badge variant={/aprov|approv/i.test(request.status) ? "success" : "secondary"}>
-                    {request.status}
+                    {statusLabel(request.status)}
                   </Badge>
                 </li>
               ))}

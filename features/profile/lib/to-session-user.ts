@@ -3,12 +3,14 @@ import type { Profile } from "../types";
 
 /** Adapta o `Profile` real pro `SessionUser` que a casca (shell/home) consome. */
 export function toSessionUser(profile: Profile): SessionUser {
+  const id = profile.role === "professor" ? profile.professorId : profile.role === "aluno" ? profile.studentId : profile.email;
+
   return {
-    id: profile.role === "professor" ? profile.professorId : profile.studentId,
+    id,
     name: profile.name,
     email: profile.email,
     role: profile.role,
-    avatarUrl: profile.hasAvatar ? "/api/avatar" : null,
+    avatarUrl: profile.role !== "admin" && profile.hasAvatar ? "/api/avatar" : null,
     tenantName: "Aulooo",
   };
 }

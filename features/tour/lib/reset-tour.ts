@@ -1,7 +1,4 @@
-import type { Role } from "@/features/auth";
-
-/** Limpa a marca de "tour já visto" e recarrega — o TourGuide reinicia do zero. */
-export function restartTour(role: Role, userId: string) {
-  localStorage.removeItem(`aulooo_tour_done_${role}_${userId}`);
-  window.location.assign("/home");
+/** Força o tour a rodar de novo, mesmo já concluído no perfil. */
+export function restartTour() {
+  window.location.assign("/home?tour=1");
 }

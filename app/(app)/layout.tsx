@@ -10,7 +10,7 @@ export default async function AppLayout({ children }: { children: ReactNode }) {
   return (
     <>
       <AppShell user={user}>{children}</AppShell>
-      <TourGuide role={user.role} userId={user.id} />
+      {profile.role !== "admin" ? <TourGuide role={profile.role} initialCompleted={profile.tourCompleted} /> : null}
     </>
   );
 }

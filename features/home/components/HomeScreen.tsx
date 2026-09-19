@@ -1,3 +1,4 @@
+import { AdminHome } from "@/features/admin";
 import { ProfessorHome } from "./ProfessorHome";
 import { StudentHome } from "./StudentHome";
 import type { HomeScreenProps } from "./home-screen-props";
@@ -9,6 +10,8 @@ export function HomeScreen({ user }: HomeScreenProps) {
       return <ProfessorHome user={user} />;
     case "aluno":
       return <StudentHome user={user} />;
+    case "admin":
+      return <AdminHome user={user} />;
     default:
       return null;
   }

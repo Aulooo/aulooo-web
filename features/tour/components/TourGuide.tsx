@@ -2,17 +2,18 @@
 
 import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ACTIONS, EVENTS, STATUS } from "react-joyride";
 import type { EventData } from "react-joyride";
-import type { Role } from "@/features/auth";
+// Import direto (não pelo barrel de features/profile): esse barrel também
+// exporta utilitários server-only (cookies) que quebram o bundle do client
+// se puxados por um "use client" — o subcaminho de actions é seguro.
+import { completeTour } from "@/features/profile/actions";
 import { PROFESSOR_TOUR, STUDENT_TOUR } from "../tour-steps";
 
 const Joyride = dynamic(() => import("react-joyride").then((mod) => mod.Joyride), { ssr: false });
 
-function doneKey(role: Role, userId: string) {
-  return `aulooo_tour_done_${role}_${userId}`;
-}
+export type TourRole = "professor" | "aluno";
 
 /** Espera a rota mudar e o alvo do passo aparecer no DOM (client nav é assíncrona). */
 function waitForRouteAndTarget(route: string, selector: string, timeoutMs = 4000): Promise<boolean> {
@@ -29,16 +30,17 @@ function waitForRouteAndTarget(route: string, selector: string, timeoutMs = 4000
   });
 }
 
-export function TourGuide({ role, userId }: { role: Role; userId: string }) {
+export function TourGuide({ role, initialCompleted }: { role: TourRole; initialCompleted: boolean }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const forceRestart = searchParams.get("tour") === "1";
   const steps = role === "professor" ? PROFESSOR_TOUR : STUDENT_TOUR;
 
   const [index, setIndex] = useState(0);
   const [run, setRun] = useState(false);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (localStorage.getItem(doneKey(role, userId))) return;
+    if (initialCompleted && !forceRestart) return;
 
     // Sem guarda de "já rodou": no StrictMode do dev este efeito dispara 2x
     // (mount → cleanup → mount) e um `cancelled` combinado com um ref de
@@ -54,9 +56,11 @@ export function TourGuide({ role, userId }: { role: Role; userId: string }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Concluído fica salvo no perfil (banco), não no navegador — reabrir em outro
+  // aparelho/navegador não repete o tour pra quem já viu.
   function finish() {
-    localStorage.setItem(doneKey(role, userId), "1");
     setRun(false);
+    if (!initialCompleted) completeTour(role).catch(() => {});
   }
 
   async function advanceTo(nextIndex: number) {

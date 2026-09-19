@@ -4,4 +4,5 @@ import type { Role } from "@/features/auth";
 export const ROLE_LABEL: Record<Role, string> = {
   professor: "Professor",
   aluno: "Aluno",
+  admin: "Administrador",
 };

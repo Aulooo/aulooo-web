@@ -3,8 +3,8 @@ export type SignInCredentials = {
   password: string;
 };
 
-/** Papéis de acesso. Não existe administrador funcional no MVP do backend. */
-export type Role = "professor" | "aluno";
+/** Papéis de acesso. */
+export type Role = "professor" | "aluno" | "admin";
 
 /** Usuário da sessão atual, já com o papel resolvido para o tenant ativo. */
 export type SessionUser = {
@@ -18,7 +18,7 @@ export type SessionUser = {
 };
 
 /** Role como a API real devolve (case do backend — distinto do `Role` mockado da UI). */
-export type ApiRole = "Professor" | "Aluno";
+export type ApiRole = "Professor" | "Aluno" | "Admin";
 
 /** `data` de AuthResponse (`POST /auth/sign-in`, `/auth/sign-up/*`). */
 export type AuthenticatedUser = {
@@ -34,6 +34,7 @@ export type AuthenticatedUser = {
 };
 
 export type ProfessorSignUpInput = {
+  entryCode: string;
   name: string;
   cpf: string;
   email: string;

@@ -1,4 +1,4 @@
-export type ProfileRole = "professor" | "aluno";
+export type ProfileRole = "professor" | "aluno" | "admin";
 
 export type ProfessorProfile = {
   role: "professor";
@@ -12,6 +12,9 @@ export type ProfessorProfile = {
   professionalDescription: string | null;
   status: string;
   hasAvatar: boolean;
+  tourCompleted: boolean;
+  /** Identificador de URL (ex.: "joao-silva" em joao-silva.aulooo.com). `null` até o professor definir um. */
+  slug: string | null;
 };
 
 export type StudentProfile = {
@@ -27,6 +30,14 @@ export type StudentProfile = {
   professorSummary: unknown;
   linkStatus: string;
   hasAvatar: boolean;
+  tourCompleted: boolean;
+};
+
+/** Admin não tem perfil de Professor/Aluno — só nome e e-mail, vindos de `/auth/me`. */
+export type AdminProfile = {
+  role: "admin";
+  name: string;
+  email: string;
 };
 
 /** Identidade visual do professor — só afeta a própria tela de perfil dele. */
@@ -40,7 +51,7 @@ export type ProfessorBrandingInput = {
 };
 
 /** Perfil do usuário autenticado — o papel real vem de `GET /auth/me`. */
-export type Profile = ProfessorProfile | StudentProfile;
+export type Profile = ProfessorProfile | StudentProfile | AdminProfile;
 
 export type UpdateProfessorProfileInput = Partial<{
   name: string;
@@ -48,6 +59,8 @@ export type UpdateProfessorProfileInput = Partial<{
   dateOfBirth: string;
   professionalRegistration: string;
   professionalDescription: string;
+  tourCompleted: boolean;
+  slug: string;
 }>;
 
 export type UpdateStudentProfileInput = Partial<{
@@ -55,4 +68,5 @@ export type UpdateStudentProfileInput = Partial<{
   phone: string;
   dateOfBirth: string;
   objective: string;
+  tourCompleted: boolean;
 }>;

@@ -62,7 +62,7 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <NotificationBell role={user.role} />
+          {user.role !== "admin" ? <NotificationBell role={user.role} /> : null}
           <ThemeToggle />
         </div>
       </div>

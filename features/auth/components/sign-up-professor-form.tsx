@@ -7,13 +7,22 @@ import { Card, CardContent } from "@/shared/components/ui/card";
 import { IDLE_ACTION_STATE } from "@/shared/lib/action-state";
 import { signUpProfessor } from "../actions/sign-up-professor";
 
-export function SignUpProfessorForm() {
+export function SignUpProfessorForm({ defaultEntryCode }: { defaultEntryCode?: string }) {
   const [state, formAction, pending] = useActionState(signUpProfessor, IDLE_ACTION_STATE);
 
   return (
     <Card className="w-full max-w-sm">
       <CardContent>
         <form action={formAction} className="space-y-4">
+          <Field
+            label="Código de convite"
+            name="entryCode"
+            defaultValue={defaultEntryCode}
+            placeholder="A7K9M2QX"
+            className="[&_input]:uppercase [&_input]:tracking-widest"
+            error={state.errors?.entryCode}
+            required
+          />
           <Field label="Nome completo" name="name" error={state.errors?.name} required />
           <Field label="CPF" name="cpf" placeholder="000.000.000-00" error={state.errors?.cpf} required />
           <Field label="E-mail" name="email" type="email" error={state.errors?.email} required />

@@ -24,6 +24,7 @@ export async function updateProfile(
       ? {
           professionalRegistration: String(formData.get("professionalRegistration") ?? ""),
           professionalDescription: String(formData.get("professionalDescription") ?? ""),
+          slug: String(formData.get("slug") ?? ""),
         }
       : { objective: String(formData.get("objective") ?? "") }),
   };

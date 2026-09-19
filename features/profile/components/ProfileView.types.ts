@@ -1,6 +1,6 @@
-import type { ProfessorBranding, Profile } from "../types";
+import type { ProfessorBranding, ProfessorProfile, StudentProfile } from "../types";
 
 export type ProfileViewProps = {
-  profile: Profile;
+  profile: ProfessorProfile | StudentProfile;
   branding: ProfessorBranding | null;
 };

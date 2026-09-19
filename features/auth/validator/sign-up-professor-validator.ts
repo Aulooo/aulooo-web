@@ -4,6 +4,7 @@ const onlyDigits = (v: string) => v.replace(/\D/g, "");
 const optionalText = z.string().trim().optional().or(z.literal(""));
 
 export const signUpProfessorSchema = z.object({
+  entryCode: z.string().trim().toUpperCase().length(8, "O código tem 8 caracteres"),
   name: z.string().trim().min(2, "Nome muito curto").max(160),
   cpf: z
     .string()

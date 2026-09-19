@@ -1,6 +1,7 @@
 import { Badge } from "@/shared/components/ui/badge";
 import { Card } from "@/shared/components/ui/card";
 import { formatDateTime } from "@/shared/lib/format";
+import { statusLabel } from "@/shared/lib/status-label";
 import type { ReschedulingRequestItem } from "../types";
 
 function badgeVariant(status: string): "warning" | "success" | "destructive" | "secondary" {
@@ -28,7 +29,7 @@ export function MyRequestsList({ requests }: { requests: ReschedulingRequestItem
                 <p className="text-sm font-medium text-foreground">
                   {formatDateTime(r.previousInterval.startsAt)} → {formatDateTime(r.requestedInterval.startsAt)}
                 </p>
-                <Badge variant={badgeVariant(r.status)}>{r.status}</Badge>
+                <Badge variant={badgeVariant(r.status)}>{statusLabel(r.status)}</Badge>
               </div>
               {r.decisionReason ? (
                 <p className="text-xs text-muted-foreground">Motivo do professor: {r.decisionReason}</p>

@@ -25,7 +25,7 @@ export function AppHeader({ user }: AppHeaderProps) {
 
         <div className="flex shrink-0 items-center gap-0.5">
           <ThemeToggle />
-          <NotificationBell role={user.role} />
+          {user.role !== "admin" ? <NotificationBell role={user.role} /> : null}
           <UserMenu user={user} />
         </div>
       </div>

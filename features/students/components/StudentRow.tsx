@@ -15,6 +15,7 @@ import {
   AlertDialogTrigger,
 } from "@/shared/components/ui/alert-dialog";
 import { initials } from "@/shared/lib/initials";
+import { statusLabel } from "@/shared/lib/status-label";
 import type { StudentRowProps } from "./StudentRow.types";
 
 export function StudentRow({ student, pending, onDeactivate, onOpenNotes }: StudentRowProps) {
@@ -35,7 +36,7 @@ export function StudentRow({ student, pending, onDeactivate, onOpenNotes }: Stud
           </p>
         </div>
 
-        <Badge variant={isActive ? "success" : "secondary"}>{student.linkStatus}</Badge>
+        <Badge variant={isActive ? "success" : "secondary"}>{statusLabel(student.linkStatus)}</Badge>
 
         <Button
           variant="ghost"

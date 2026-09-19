@@ -23,4 +23,5 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     materiais,
     perfil,
   ],
+  admin: [inicio, perfil],
 };

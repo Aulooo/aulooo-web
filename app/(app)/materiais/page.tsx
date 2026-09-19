@@ -1,9 +1,11 @@
+import { redirect } from "next/navigation";
 import { MateriaisView, getMaterialsForStudent, getMyMaterialsAsStudent } from "@/features/documents";
 import { getMyStudents } from "@/features/students";
 import { getCurrentProfile } from "@/features/profile";
 
 export default async function MateriaisPage() {
   const profile = await getCurrentProfile();
+  if (profile.role === "admin") redirect("/home");
 
   if (profile.role === "aluno") {
     const documents = await getMyMaterialsAsStudent();
