@@ -11,6 +11,8 @@ export async function savePolicy(_prev: ActionState, formData: FormData): Promis
   const parsed = policyInputSchema.safeParse({
     minimumNoticeHours: String(formData.get("minimumNoticeHours") ?? ""),
     monthlyLimit: String(formData.get("monthlyLimit") ?? ""),
+    // Checkbox nativo: presente no FormData só quando marcado.
+    allowStudentSelfScheduling: formData.get("allowStudentSelfScheduling") === "on",
   });
 
   if (!parsed.success) {

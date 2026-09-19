@@ -1,5 +1,5 @@
 import { apiClient } from "@/core/http/api-client";
-import type { CreateClassInput, CreateSeriesInput, LessonClass } from "../types";
+import type { AvailabilitySlot, CreateClassInput, CreateSeriesInput, LessonClass } from "../types";
 
 type RawClass = {
   classId: string;
@@ -54,4 +54,7 @@ export const scheduleApi = {
     const res = await apiClient.post<RawClass>(`/professors/me/classes/${classId}/cancel`);
     return { ...res, data: res.data ? toLesson(res.data) : null };
   },
+
+  getStudentSlots: (from: string, to: string) =>
+    apiClient.get<AvailabilitySlot[]>(`/students/me/availability-slots?from=${from}&to=${to}`),
 };

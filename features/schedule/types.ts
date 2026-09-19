@@ -35,3 +35,16 @@ export type CreateSeriesInput = {
   startDate: string;
   endDate: string;
 };
+
+/** Um horário livre/ocupado dentro da disponibilidade recorrente do professor. */
+export type AvailabilitySlot = {
+  /** YYYY-MM-DD */
+  date: string;
+  /** HH:mm */
+  startTime: string;
+  /** HH:mm */
+  endTime: string;
+  startsAt: string;
+  endsAt: string;
+  status: "Available" | "Occupied";
+};
