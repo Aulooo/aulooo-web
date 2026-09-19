@@ -1,2 +1,4 @@
 export { SignInForm } from "./components/sign-in-form";
-export type { AuthenticatedUser, SignInCredentials, Role, SessionUser } from "./types";
+export { SignUpProfessorForm } from "./components/sign-up-professor-form";
+export { SignUpStudentForm } from "./components/sign-up-student-form";
+export type { AuthenticatedUser, ApiRole, SignInCredentials, Role, SessionUser } from "./types";

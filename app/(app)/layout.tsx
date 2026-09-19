@@ -1,15 +1,16 @@
 import type { ReactNode } from "react";
 import { AppShell } from "@/features/shell";
-import { RoleSwitcher } from "@/features/dev";
-import { getMockSession } from "@/mock/session";
+import { getCurrentProfile, toSessionUser } from "@/features/profile";
+import { TourGuide } from "@/features/tour";
 
 export default async function AppLayout({ children }: { children: ReactNode }) {
-  const user = await getMockSession();
+  const profile = await getCurrentProfile();
+  const user = toSessionUser(profile);
 
   return (
     <>
       <AppShell user={user}>{children}</AppShell>
-      {process.env.NODE_ENV !== "production" && <RoleSwitcher currentRole={user.role} />}
+      {profile.role !== "admin" ? <TourGuide role={profile.role} initialCompleted={profile.tourCompleted} /> : null}
     </>
   );
 }

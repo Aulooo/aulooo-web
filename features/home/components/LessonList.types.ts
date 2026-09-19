@@ -1,6 +1,6 @@
-import type { Lesson } from "@/features/schedule";
+import type { LessonClass } from "@/features/schedule";
 
 export type LessonListProps = {
-  lessons: Lesson[];
+  lessons: LessonClass[];
   emptyLabel?: string;
 };

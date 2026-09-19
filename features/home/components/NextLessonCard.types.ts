@@ -1,5 +1,5 @@
-import type { Lesson } from "@/features/schedule";
+import type { LessonClass } from "@/features/schedule";
 
 export type NextLessonCardProps = {
-  lesson: Lesson | null;
+  lesson: LessonClass | null;
 };

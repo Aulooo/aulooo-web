@@ -1,19 +1,15 @@
-export type StudentStatus = "active" | "trial" | "inactive";
-
-export type Student = {
-  id: string;
+/** Perfil reduzido de aluno, como o professor enxerga (sem CPF/e-mail/data de nascimento). */
+export type StudentSummary = {
+  studentId: string;
   name: string;
-  avatarUrl?: string | null;
-  email: string;
-  phone: string;
-  status: StudentStatus;
-  /** Plano/pacote contratado (texto livre por ora). */
-  plan: string;
-  /** Mensalidade em centavos. */
-  monthlyFeeCents: number;
-  /** Dia de vencimento da mensalidade (1–28). */
-  dueDay: number;
-  /** Professor responsável (SessionUser.id). */
-  teacherId: string;
-  joinedAt: string;
+  phone: string | null;
+  objective: string | null;
+  linkStatus: string;
+};
+
+export type EntryCode = {
+  codeId: string;
+  code: string;
+  expiresAt: string;
+  status: string;
 };

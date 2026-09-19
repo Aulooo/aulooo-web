@@ -1,20 +1,10 @@
 import type { Announcement } from "@/features/announcements";
 import type { StudyDocument } from "@/features/documents";
-import type { Payment } from "@/features/payments";
-import type { Lesson } from "@/features/schedule";
-import type { Student } from "@/features/students";
-
-/** Pagamento em aberto já enriquecido com o aluno e o atraso. */
-export type PendingPayment = {
-  payment: Payment;
-  student: Student;
-  daysOverdue: number;
-};
+import type { LessonClass } from "@/features/schedule";
 
 export type StudentHomeData = {
   firstName: string;
-  nextLesson: Lesson | null;
-  currentPayment: Payment | null;
+  nextLesson: LessonClass | null;
   announcements: Announcement[];
   documents: StudyDocument[];
 };
@@ -22,29 +12,6 @@ export type StudentHomeData = {
 export type ProfessorHomeData = {
   firstName: string;
   activeStudents: number;
-  receivedCents: number;
-  toReceiveCents: number;
-  lessonsToday: Lesson[];
-  pendingPayments: PendingPayment[];
+  lessonsToday: LessonClass[];
   announcements: Announcement[];
-};
-
-export type ActivityKind = "payment" | "student" | "announcement";
-
-export type ActivityItem = {
-  id: string;
-  kind: ActivityKind;
-  text: string;
-  at: string;
-};
-
-export type AdminHomeData = {
-  firstName: string;
-  tenantName: string;
-  activeStudents: number;
-  activeTeachers: number;
-  revenueCents: number;
-  overdueCents: number;
-  overdueCount: number;
-  activity: ActivityItem[];
 };

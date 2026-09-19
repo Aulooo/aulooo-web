@@ -15,11 +15,6 @@ export function isToday(iso: string): boolean {
   return t >= startOfToday() && t <= endOfToday();
 }
 
-/** Dias corridos de atraso (0 se ainda não venceu). */
-export function daysOverdue(dueISO: string, now = Date.now()): number {
-  return Math.max(0, Math.floor((now - new Date(dueISO).getTime()) / DAY_MS));
-}
-
 export const byStartAsc = (a: { startsAt: string }, b: { startsAt: string }) =>
   new Date(a.startsAt).getTime() - new Date(b.startsAt).getTime();
 

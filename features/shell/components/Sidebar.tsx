@@ -2,10 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Bell } from "lucide-react";
 import { cn } from "cn";
 import { Logo } from "@/shared/brand/Logo";
-import { Button } from "@/shared/components/ui/button";
+import { NotificationBell } from "@/features/notifications";
 import { NAV_BY_ROLE } from "../nav-config";
 import { ROLE_LABEL } from "../role-label";
 import { ThemeToggle } from "./ThemeToggle";
@@ -63,9 +62,7 @@ export function Sidebar({ user }: SidebarProps) {
           </div>
         </div>
         <div className="flex items-center gap-1">
-          <Button variant="ghost" size="icon" aria-label="Notificações">
-            <Bell />
-          </Button>
+          {user.role !== "admin" ? <NotificationBell role={user.role} /> : null}
           <ThemeToggle />
         </div>
       </div>

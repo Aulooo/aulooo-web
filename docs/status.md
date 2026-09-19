@@ -22,14 +22,23 @@ auth em dev**. Nada de mock vai para produção — ver [`frontend-mock-first.md
 
 ### O que já existe
 
-| Área | Rota | Estado |
-| --- | --- | --- |
-| **Identidade / design system** | — | shadcn "Nova" (`radix-nova`) + tokens "Caderno" (creme + azul + acento terracota, fonte Bricolage nos títulos) |
-| **Casca (shell)** | todas `(app)` | Header + bottom nav no mobile; sidebar no desktop (`md+`). Tema claro/escuro com toggle |
-| **Home por papel** | `/home` | ✅ Completa (mock): aluno, professor, administrador — cada uma com cards/métricas/listas próprias |
-| **Pessoas (cadastro)** | `/usuarios` | ✅ Funcional (mock via JSON): listar, criar, editar, desativar/reativar. Só admin. Uma pessoa pode ter 1+ papéis (aluno e/ou professor e/ou admin) |
-| **Login (sign-in)** | `/sign-in` | Feito antes (AU-1), **travado** aguardando back-end |
-| Materiais, Agenda, Pagamentos, Financeiro, Relatórios, Avisos, Perfil | `/materiais` etc. | 🚧 Stubs ("Em construção") — só a rota e o item de menu existem |
+Tudo mockado é **funcional** (cria/edita/apaga de verdade, grava em JSON local).
+
+| Módulo | Rota | Quem | O que dá pra fazer |
+| --- | --- | --- | --- |
+| **Identidade / design system** | — | — | shadcn "Nova" + tokens "Caderno" (creme/azul/terracota, títulos Bricolage) |
+| **Casca (shell)** | todas `(app)` | — | header + bottom nav (mobile) / sidebar (desktop), tema claro/escuro |
+| **Início (home)** | `/home` | todos | dashboard por papel — métricas, agenda, pagamentos, avisos, atalhos |
+| **Pessoas** | `/usuarios` | admin | listar/criar/editar/desativar; papéis múltiplos por pessoa |
+| **Meus alunos** | `/alunos` | professor | carteira do professor; "Novo aluno" já vincula o aluno a ele |
+| **Avisos** | `/avisos` | professor/admin cria · aluno lê | aviso para a turma **ou** para um aluno; fixar; editar/apagar |
+| **Agenda** | `/agenda` | professor gerencia · aluno lê | agendar/editar/cancelar aula (aluno ou turma, presencial/online) |
+| **Materiais** | `/materiais` | professor/admin cria · aluno lê | publicar link/material para a turma ou um aluno; apagar |
+| **Financeiro** | `/financeiro` | professor/admin | resumo do mês + marcar mensalidade como paga |
+| **Pagamentos** | `/pagamentos` | aluno | suas mensalidades + "Pagar com Pix" (mock) |
+| **Relatórios** | `/relatorios` | admin | métricas da conta, quebra de mensalidades, alunos por professor |
+| **Perfil** | `/perfil` | todos | ver/editar nome, telefone, especialidade; toggle de tema |
+| **Login (sign-in)** | `/sign-in` | — | feito antes (AU-1), **travado** aguardando back-end |
 
 ### Como rodar e testar
 
@@ -40,21 +49,23 @@ npm run dev
 - Abre em `/` → redireciona pra `/home`. **Não precisa login** (bypass de dev no `proxy.ts`).
 - **Trocar de papel**: pílula flutuante no canto inferior direito (só em dev). Ou o cookie
   `aulooo_mock_role` = `admin` | `professor` | `aluno`. Padrão: `professor` (em `mock/role-cookie.ts`).
-- **Pessoas**: entre como `admin` → `/usuarios`. As ações gravam em `mock/people.data.json`
-  (gitignored, recriado do seed na primeira visita).
+- As ações de escrita gravam em `mock/data/*.json` (gitignored, recriado do seed). Para
+  resetar tudo: apague `mock/data/`.
 
 ## Camadas (resumo — detalhe em `architecture.md`)
 
 ```
 app/          rotas (App Router). Grupo (app) = autenticado, com a casca.
-features/     uma pasta por funcionalidade (auth, shell, home, people, dev, + tipos de domínio)
+features/     auth · shell · dev · home · people · announcements · schedule · documents · payments · profile · reports
 core/         infra (http client, cookies, jwt, config)
-shared/       genérico: components/ui (shadcn), components (compostos), brand, lib
-mock/         DEV-ONLY: dados falsos + store JSON de pessoas
+shared/       genérico: components/ui (shadcn), components (compostos), components/form, brand, lib
+mock/         DEV-ONLY: seeds + mock/db/* (stores JSON, um por recurso) + mock/data/ (gitignored)
 docs/         esta pasta
 ```
 
 Regra de dependência: `app → features → shared, core`. `mock/` pode ser usado por `features/` e `app/`.
+Cada `mock/db/<x>.ts` tem a interface de um CRUD REST — ver
+[`api-contract-assumptions.md`](./api-contract-assumptions.md).
 
 ## Convenções que você precisa saber
 
@@ -70,12 +81,13 @@ Regra de dependência: `app → features → shared, core`. `mock/` pode ser usa
 
 ## Próximos passos (não feitos)
 
-- Construir os módulos que hoje são stub (materiais, agenda, pagamentos, financeiro…).
-- Unificar `mock/students.ts` + `mock/teachers.ts` com `mock/people.*` (hoje coexistem;
-  as homes leem os antigos, `/usuarios` lê o novo).
+- **Integração com a API** quando a especificação chegar — comparar com
+  [`api-contract-assumptions.md`](./api-contract-assumptions.md), criar `features/<x>/api/`,
+  trocar `mock/db/<x>` pela `api/`, remover `mock/` e `features/dev/` e o bypass do `proxy.ts`.
+- Upload real de arquivo em Materiais (hoje é só URL).
 - Troca de tenant/conta (a mesma pessoa em contas diferentes).
-- Integração real: remover bypass do `proxy.ts`, trocar cada mock por `features/<x>/api/`,
-  remover `mock/` e `features/dev/`.
+- Notificações (o sino do header é decorativo).
 - Acessibilidade: revisar contraste do `--primary`.
+- Empty/erro/loading mais caprichados em algumas telas.
 - Desktop: hoje vai direto de bottom nav (mobile) pra sidebar fixa (`md+`), sem estado
   intermediário pra tablet.

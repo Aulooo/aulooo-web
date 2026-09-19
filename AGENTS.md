@@ -16,6 +16,9 @@ de roles (usuário ↔ role) no backend; **hoje é mockado**.
 É um **app único roteado por papel** (`/home` resolve a tela pelo papel; não há app/login
 separado). Uma pessoa pode ter mais de um papel e ser professor num tenant e aluno em outro.
 
+A API está sendo especificada em paralelo. `AU-1` (sign-in) foi de outro dev — feito e
+travado aguardando back-end; não reescrever.
+
 ## Estado atual: front-end sem back-end
 
 O back-end ainda está em desenvolvimento. O front está sendo construído com **dados
@@ -28,21 +31,27 @@ Pontos de atenção:
 
 - **`proxy.ts`** tem um **bypass de autenticação em desenvolvimento** (`NODE_ENV !== "production"`
   libera todas as rotas). **Remover** quando o login real do back-end existir.
-- **`mock/`** = dados falsos. Módulos "estáticos" (`students`, `payments`, …) alimentam as
-  homes; `mock/people-store.ts` grava/lê `mock/people.data.json` (o "DB" do cadastro de
-  pessoas). Cada bloco vira uma chamada em `features/<x>/api/` quando o endpoint existir —
-  a forma dos dados (tipos nas features) não muda.
+- **`mock/`** = dados falsos. `mock/db/<x>.ts` são stores JSON (um por recurso) com
+  interface de CRUD REST; gravam em `mock/data/*.json` (gitignored). Cada um vira
+  `features/<x>/api/` quando o endpoint existir. **Contrato assumido:
+  [`docs/api-contract-assumptions.md`](docs/api-contract-assumptions.md).**
 - **Dev role switcher** (`features/dev`): pílula flutuante só em dev que troca o papel da
   sessão gravando o cookie `aulooo_mock_role`.
 
-## Feito até agora
+## Feito até agora (tudo mockado e funcional)
 
 - Design system (shadcn "Nova") + identidade "Caderno".
 - Casca (`features/shell`) mobile-first + sidebar desktop + tema claro/escuro.
-- Homes por papel (`features/home`) — aluno / professor / administrador, completas (mock).
-- **Cadastro e gestão de pessoas** (`features/people`, rota `/usuarios`, só admin):
-  listar / criar / editar / desativar, com papéis múltiplos por pessoa. Grava no JSON.
-- Demais módulos (materiais, agenda, financeiro, …) são **stubs** "Em construção".
+- **Início** (`features/home`) — dashboard por papel.
+- **Pessoas** (`features/people`, `/usuarios`) — admin; papéis múltiplos por pessoa.
+  Reusado em `/alunos` (`scope="my-students"`) para a carteira do professor.
+- **Avisos** (`features/announcements`, `/avisos`) — turma ou aluno específico.
+- **Agenda** (`features/schedule`, `/agenda`) — agendar/editar/cancelar aula.
+- **Materiais** (`features/documents`, `/materiais`) — publicar link para turma/aluno.
+- **Financeiro / Pagamentos** (`features/payments`) — marcar pago / pagar.
+- **Relatórios** (`features/reports`, `/relatorios`) — admin.
+- **Perfil** (`features/profile`, `/perfil`).
+- Formulários: Server Actions + `useActionState` + `<FormSheet>` (`shared/components/form`).
 
 # UI
 
