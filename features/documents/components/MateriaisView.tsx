@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Archive, FileSpreadsheet, FileText, Plus } from "lucide-react";
+import { Archive, Download, FileSpreadsheet, FileText, Plus } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -20,17 +20,21 @@ import {
 import { EmptyState } from "@/shared/components/EmptyState";
 import { formatBytes, formatRelative } from "@/shared/lib/format";
 import { deactivateDocument } from "../actions/deactivate-document";
+import { normalizeExtension } from "../lib/preview-kind";
+import { materialDownloadUrl } from "../lib/material-url";
 import { DocumentFormSheet } from "./DocumentFormSheet";
+import { MaterialPreviewSheet } from "./MaterialPreviewSheet";
 import type { MateriaisViewProps } from "./MateriaisView.types";
 
 const SHEET_EXTENSIONS = new Set(["xls", "xlsx", "csv"]);
 
 function iconFor(extension: string): LucideIcon {
-  return SHEET_EXTENSIONS.has(extension.toLowerCase()) ? FileSpreadsheet : FileText;
+  return SHEET_EXTENSIONS.has(normalizeExtension(extension)) ? FileSpreadsheet : FileText;
 }
 
 export function MateriaisView({ documents, mode, students, studentNameById }: MateriaisViewProps) {
   const [open, setOpen] = useState(false);
+  const [previewing, setPreviewing] = useState<{ id: string; name: string; extension: string } | null>(null);
   const [pending, startTransition] = useTransition();
   const canManage = mode === "manage";
 
@@ -67,11 +71,12 @@ export function MateriaisView({ documents, mode, students, studentNameById }: Ma
                   <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
                     <Icon className="size-4" aria-hidden />
                   </span>
-                  <a
-                    href={`/api/materials/${doc.id}/download`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="min-w-0 flex-1"
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setPreviewing({ id: doc.id, name: doc.originalName, extension: doc.extension })
+                    }
+                    className="min-w-0 flex-1 text-left"
                   >
                     <p className="truncate text-sm font-medium text-foreground hover:underline">
                       {doc.originalName}
@@ -79,7 +84,14 @@ export function MateriaisView({ documents, mode, students, studentNameById }: Ma
                     <p className="text-xs text-muted-foreground">
                       {formatBytes(doc.size)} · {formatRelative(doc.sentAt)}
                     </p>
-                  </a>
+                  </button>
+                  {!canManage ? (
+                    <Button variant="ghost" size="icon-sm" aria-label="Baixar" asChild>
+                      <a href={materialDownloadUrl(doc.id)} download>
+                        <Download />
+                      </a>
+                    </Button>
+                  ) : null}
                   {canManage ? (
                     <Badge variant="secondary">{studentNameById[doc.studentId ?? ""] ?? "Aluno"}</Badge>
                   ) : null}
@@ -114,6 +126,15 @@ export function MateriaisView({ documents, mode, students, studentNameById }: Ma
       )}
 
       {open ? <DocumentFormSheet students={students} onClose={() => setOpen(false)} /> : null}
+
+      {previewing ? (
+        <MaterialPreviewSheet
+          documentId={previewing.id}
+          name={previewing.name}
+          extension={previewing.extension}
+          onClose={() => setPreviewing(null)}
+        />
+      ) : null}
     </div>
   );
 }

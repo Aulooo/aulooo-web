@@ -3,7 +3,7 @@
 import { useActionState, useEffect } from "react";
 import { Field } from "@/shared/components/form/Field";
 import { FormSheet } from "@/shared/components/form/FormSheet";
-import { SelectField } from "@/shared/components/form/SelectField";
+import { RecipientPickerField } from "@/shared/components/form/RecipientPickerField";
 import { IDLE_ACTION_STATE } from "@/shared/lib/action-state";
 import { uploadDocument } from "../actions/upload-document";
 import type { DocumentFormSheetProps } from "./DocumentFormSheet.types";
@@ -25,13 +25,11 @@ export function DocumentFormSheet({ students, onClose }: DocumentFormSheetProps)
       error={!state.ok ? state.message : undefined}
       onClose={onClose}
     >
-      <SelectField
-        label="Aluno"
-        name="studentId"
+      <RecipientPickerField
+        label="Enviar para"
+        name="studentIds"
         options={students.map((s) => ({ value: s.id, label: s.name }))}
-        error={state.errors?.studentId}
-        placeholder="Escolha o aluno"
-        required
+        error={state.errors?.studentIds}
       />
 
       <Field
