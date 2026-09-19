@@ -4,6 +4,7 @@ import type {
   ProfessorBranding,
   ProfessorBrandingInput,
   ProfessorProfile,
+  StudentProfessorSummary,
   StudentProfile,
   UpdateProfessorProfileInput,
   UpdateStudentProfileInput,
@@ -43,6 +44,8 @@ export const profileApi = {
   getStudentProfile: () => apiClient.get<RawStudentProfile>("/students/me"),
   updateStudentProfile: (input: UpdateStudentProfileInput) =>
     apiClient.patch<RawStudentProfile>("/students/me", input),
+
+  getStudentProfessor: () => apiClient.get<StudentProfessorSummary>("/students/me/professor"),
 
   updateEmail: (email: string) => apiClient.patch<{ email: string }>("/me/email", { email }),
 

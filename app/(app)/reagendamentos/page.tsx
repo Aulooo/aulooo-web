@@ -1,6 +1,11 @@
 import { redirect } from "next/navigation";
-import { ReschedulingRequestsView, getMyRequests, getPolicy } from "@/features/rescheduling";
-import type { RequestWithStudent } from "@/features/rescheduling";
+import {
+  ReschedulingRequestsView,
+  getMyRequests,
+  getMySchedulingRequests,
+  getPolicy,
+} from "@/features/rescheduling";
+import type { RequestWithStudent, SchedulingRequestWithStudent } from "@/features/rescheduling";
 import { getClassAsProfessor } from "@/features/schedule";
 import { getMyStudents } from "@/features/students";
 import { getCurrentProfile } from "@/features/profile";
@@ -9,8 +14,9 @@ export default async function ReagendamentosPage() {
   const profile = await getCurrentProfile();
   if (profile.role !== "professor") redirect("/home");
 
-  const [requests, policy, students] = await Promise.all([
+  const [requests, schedulingRequests, policy, students] = await Promise.all([
     getMyRequests("professor"),
+    getMySchedulingRequests("professor"),
     getPolicy(),
     getMyStudents(),
   ]);
@@ -25,5 +31,10 @@ export default async function ReagendamentosPage() {
     }),
   );
 
-  return <ReschedulingRequestsView items={items} policy={policy} />;
+  const newClassItems: SchedulingRequestWithStudent[] = schedulingRequests.map((request) => ({
+    request,
+    studentName: studentNameById[request.studentId] || "Aluno",
+  }));
+
+  return <ReschedulingRequestsView items={items} schedulingRequests={newClassItems} policy={policy} />;
 }

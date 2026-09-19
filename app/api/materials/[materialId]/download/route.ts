@@ -11,7 +11,7 @@ import { getCurrentProfile } from "@/features/profile";
  * repassa o stream binário com os mesmos headers.
  */
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ materialId: string }> },
 ) {
   const { materialId } = await params;

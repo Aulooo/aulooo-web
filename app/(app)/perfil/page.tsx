@@ -1,4 +1,4 @@
-import { AdminProfileView, ProfileView, getCurrentProfile, getMyBranding } from "@/features/profile";
+import { AdminProfileView, ProfileView, getCurrentProfile, getMyBranding, getMyProfessor } from "@/features/profile";
 
 export default async function PerfilPage() {
   const profile = await getCurrentProfile();
@@ -8,6 +8,7 @@ export default async function PerfilPage() {
   }
 
   const branding = profile.role === "professor" ? await getMyBranding() : null;
+  const myProfessor = profile.role === "aluno" ? await getMyProfessor() : null;
 
-  return <ProfileView profile={profile} branding={branding} />;
+  return <ProfileView profile={profile} branding={branding} myProfessor={myProfessor} />;
 }

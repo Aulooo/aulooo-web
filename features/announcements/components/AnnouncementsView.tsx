@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { Archive, Megaphone, Pencil, Plus } from "lucide-react";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
 import {
@@ -24,14 +25,27 @@ import type { AnnouncementsViewProps } from "./AnnouncementsView.types";
 
 type SheetState = { kind: "closed" } | { kind: "create" } | { kind: "edit"; item: Announcement };
 
-export function AnnouncementsView({ announcements, mode }: AnnouncementsViewProps) {
+export function AnnouncementsView({ announcements, mode, students }: AnnouncementsViewProps) {
   const [sheet, setSheet] = useState<SheetState>({ kind: "closed" });
   const [pending, startTransition] = useTransition();
   const canManage = mode === "manage";
 
+  const studentNameById = useMemo(
+    () => Object.fromEntries(students.map((s) => [s.id, s.name])),
+    [students],
+  );
+
   const sorted = [...announcements].sort(
     (a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime(),
   );
+
+  function audienceLabel(item: Announcement) {
+    if (item.audience !== "Specific" || item.recipientStudentIds.length === 0) return "Todos os alunos";
+    if (item.recipientStudentIds.length === 1) {
+      return studentNameById[item.recipientStudentIds[0]] ?? "1 aluno";
+    }
+    return `${item.recipientStudentIds.length} alunos`;
+  }
 
   return (
     <div className="space-y-4" data-tour="avisos-list">
@@ -68,7 +82,8 @@ export function AnnouncementsView({ announcements, mode }: AnnouncementsViewProp
 
                 <p className="px-4 text-sm whitespace-pre-line text-muted-foreground">{item.content}</p>
 
-                <div className="flex items-center justify-end gap-2 px-4">
+                <div className="flex items-center justify-between gap-2 px-4">
+                  {canManage ? <Badge variant="secondary">{audienceLabel(item)}</Badge> : <span />}
                   {canManage ? (
                     <div className="flex items-center gap-1">
                       <Button
@@ -119,6 +134,7 @@ export function AnnouncementsView({ announcements, mode }: AnnouncementsViewProp
       {sheet.kind !== "closed" ? (
         <AnnouncementFormSheet
           announcement={sheet.kind === "edit" ? sheet.item : null}
+          students={students}
           onClose={() => setSheet({ kind: "closed" })}
         />
       ) : null}

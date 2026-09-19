@@ -3,12 +3,13 @@
 import { useActionState, useEffect } from "react";
 import { Field } from "@/shared/components/form/Field";
 import { FormSheet } from "@/shared/components/form/FormSheet";
+import { RecipientPickerField } from "@/shared/components/form/RecipientPickerField";
 import { TextareaField } from "@/shared/components/form/TextareaField";
 import { IDLE_ACTION_STATE } from "@/shared/lib/action-state";
 import { saveAnnouncement } from "../actions/save-announcement";
 import type { AnnouncementFormSheetProps } from "./AnnouncementFormSheet.types";
 
-export function AnnouncementFormSheet({ announcement, onClose }: AnnouncementFormSheetProps) {
+export function AnnouncementFormSheet({ announcement, students, onClose }: AnnouncementFormSheetProps) {
   const [state, formAction, pending] = useActionState(saveAnnouncement, IDLE_ACTION_STATE);
   const isEdit = Boolean(announcement);
 
@@ -42,6 +43,23 @@ export function AnnouncementFormSheet({ announcement, onClose }: AnnouncementFor
         error={state.errors?.content}
         required
       />
+
+      {isEdit ? (
+        <p className="text-xs text-muted-foreground">
+          {announcement?.audience === "Specific"
+            ? `Enviado só para ${announcement.recipientStudentIds.length} aluno(s) — não é possível alterar os destinatários depois de publicado.`
+            : "Enviado para todos os alunos — não é possível alterar os destinatários depois de publicado."}
+        </p>
+      ) : (
+        <RecipientPickerField
+          label="Enviar para"
+          name="studentIds"
+          options={students.map((s) => ({ value: s.id, label: s.name }))}
+          error={state.errors?.studentIds}
+          allMeansBroadcast
+          defaultAll
+        />
+      )}
     </FormSheet>
   );
 }
