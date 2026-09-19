@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { Compass, Moon, Pencil } from "lucide-react";
+import { env } from "@/core/config/env";
 import { Avatar, AvatarFallback, AvatarImage } from "@/shared/components/ui/avatar";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
@@ -27,7 +28,7 @@ function Row({ label, value }: { label: string; value: string | null }) {
   );
 }
 
-export function ProfileView({ profile, branding }: ProfileViewProps) {
+export function ProfileView({ profile, branding, myProfessor }: ProfileViewProps) {
   const [editing, setEditing] = useState(false);
   const [state, formAction, pending] = useActionState(
     updateProfile.bind(null, profile.role, profile.email),
@@ -88,6 +89,32 @@ export function ProfileView({ profile, branding }: ProfileViewProps) {
           )}
         </CardContent>
       </Card>
+
+      {!isProfessor && myProfessor ? (
+        <Card className="overflow-hidden py-0">
+          {myProfessor.hasBanner && myProfessor.slug ? (
+            // eslint-disable-next-line @next/next/no-img-element -- URL absoluta pra API pública
+            <img
+              src={`${env.apiUrl}/public/professors/by-slug/${myProfessor.slug}/banner`}
+              alt=""
+              className="h-24 w-full object-cover"
+            />
+          ) : null}
+          <CardContent className="space-y-2 py-4">
+            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">Sobre o professor</p>
+            <p
+              className="font-heading text-base font-semibold text-foreground"
+              style={myProfessor.brandColor ? { color: myProfessor.brandColor } : undefined}
+            >
+              {myProfessor.name}
+            </p>
+            <p className="text-sm text-muted-foreground">{myProfessor.professionalRegistration}</p>
+            {myProfessor.description ? (
+              <p className="text-sm text-foreground">{myProfessor.description}</p>
+            ) : null}
+          </CardContent>
+        </Card>
+      ) : null}
 
       <Card>
         <CardContent className="flex items-center justify-between gap-3">

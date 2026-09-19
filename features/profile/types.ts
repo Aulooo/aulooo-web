@@ -33,6 +33,18 @@ export type StudentProfile = {
   tourCompleted: boolean;
 };
 
+/** `GET /students/me/professor` — resumo público do professor vinculado ao aluno. */
+export type StudentProfessorSummary = {
+  professorId: string;
+  name: string;
+  professionalRegistration: string;
+  description: string | null;
+  status: string;
+  slug: string | null;
+  brandColor: string | null;
+  hasBanner: boolean;
+};
+
 /** Admin não tem perfil de Professor/Aluno — só nome e e-mail, vindos de `/auth/me`. */
 export type AdminProfile = {
   role: "admin";
