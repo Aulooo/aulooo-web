@@ -1,0 +1,236 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================================
+ * Identidade Aulooo — "Caderno" (quente e humano)
+ *
+ * - Azul de marca (a logo): `--brand` (#55aaff), usado como assinatura/realce.
+ * - Azul de ação, mais fundo e legível: `--primary`.
+ * - Acento quente (terracota): `--brand-warm`, pontual.
+ * - Neutros levemente quentes (fundo creme, não branco puro).
+ * - Títulos em Bricolage Grotesque (`--font-heading`).
+ * Use SEMPRE os tokens semânticos nos componentes, nunca `--blue-*` direto.
+ * ========================================================================== */
+
+:root {
+  /* --- paleta de marca ---------------------------------------------------- */
+  --blue-50: #eef7ff;
+  --blue-100: #e6f2ff;
+  --blue-200: #cae5ff;
+  --blue-500: #55aaff;
+  --blue-600: #4d99e6;
+  --blue-700: #4488cc;
+  --blue-800: #4080bf;
+  --blue-900: #336699;
+  --blue-950: #264c73;
+  --blue-1000: #1e3b59;
+
+  --brand: #55aaff;
+  --brand-foreground: #ffffff;
+  --brand-warm: #db7248;
+  --brand-warm-foreground: #ffffff;
+
+  --radius: 0.75rem;
+
+  /* --- tokens semânticos (tema claro) ---------------------------------- */
+  --background: #fbfaf8;
+  --foreground: #21303f;
+
+  --card: #ffffff;
+  --card-foreground: #21303f;
+  --popover: #ffffff;
+  --popover-foreground: #21303f;
+
+  --primary: #2f6fbf;
+  --primary-foreground: #ffffff;
+
+  --secondary: #eef4fb;
+  --secondary-foreground: #21303f;
+
+  --muted: #f1efea;
+  --muted-foreground: #6b655d;
+
+  --accent: #eef4fb;
+  --accent-foreground: #21303f;
+
+  --destructive: #cf4b47;
+  --destructive-foreground: #ffffff;
+
+  --border: #e8e3da;
+  --input: #e8e3da;
+  --ring: #55aaff;
+
+  /* --- status extra ---------------------------------------------------- */
+  --success: #2f9e6e;
+  --success-foreground: #ffffff;
+  --warning: #c98a1b;
+  --warning-foreground: #ffffff;
+  --info: #2f6fbf;
+  --info-foreground: #ffffff;
+
+  /* --- charts -------------------------------------------------------------- */
+  --chart-1: var(--primary);
+  --chart-2: var(--brand-warm);
+  --chart-3: var(--success);
+  --chart-4: var(--brand);
+  --chart-5: #7c6df2;
+
+  /* --- sidebar ----------------------------------------------------------- */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #21303f;
+  --sidebar-primary: #2f6fbf;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f1efea;
+  --sidebar-accent-foreground: #21303f;
+  --sidebar-border: #e8e3da;
+  --sidebar-ring: #55aaff;
+}
+
+.dark {
+  --background: #17181a;
+  --foreground: #ece9e4;
+
+  --card: #201f1d;
+  --card-foreground: #ece9e4;
+  --popover: #201f1d;
+  --popover-foreground: #ece9e4;
+
+  --primary: #4d93dd;
+  --primary-foreground: #0f1114;
+
+  --secondary: #262b31;
+  --secondary-foreground: #ece9e4;
+
+  --muted: #262421;
+  --muted-foreground: #a39d95;
+
+  --accent: #262421;
+  --accent-foreground: #ece9e4;
+
+  --destructive: #e05a55;
+  --destructive-foreground: #ffffff;
+
+  --border: #322f2b;
+  --input: #38352f;
+  --ring: #55aaff;
+
+  --brand-warm: #e0855c;
+
+  --success: #3cb984;
+  --warning: #e0a53a;
+  --info: #4d93dd;
+
+  --chart-1: var(--primary);
+  --chart-2: var(--brand-warm);
+  --chart-3: var(--success);
+  --chart-4: var(--brand);
+  --chart-5: #9a8df5;
+
+  --sidebar: #201f1d;
+  --sidebar-foreground: #ece9e4;
+  --sidebar-primary: #4d93dd;
+  --sidebar-primary-foreground: #0f1114;
+  --sidebar-accent: #262421;
+  --sidebar-accent-foreground: #ece9e4;
+  --sidebar-border: #322f2b;
+  --sidebar-ring: #55aaff;
+}
+
+@theme inline {
+  /* paleta de marca → utilitários */
+  --color-blue-50: var(--blue-50);
+  --color-blue-100: var(--blue-100);
+  --color-blue-200: var(--blue-200);
+  --color-blue-500: var(--blue-500);
+  --color-blue-600: var(--blue-600);
+  --color-blue-700: var(--blue-700);
+  --color-blue-800: var(--blue-800);
+  --color-blue-900: var(--blue-900);
+  --color-blue-950: var(--blue-950);
+  --color-blue-1000: var(--blue-1000);
+
+  --color-brand: var(--brand);
+  --color-brand-foreground: var(--brand-foreground);
+  --color-brand-warm: var(--brand-warm);
+  --color-brand-warm-foreground: var(--brand-warm-foreground);
+
+  /* semânticos shadcn */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* status extra */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* charts */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* sidebar */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* raios (derivados de --radius, consumidos pelos componentes shadcn) */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
+  --radius-4xl: calc(var(--radius) + 24px);
+
+  /* tipografia */
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-bricolage), var(--font-geist-sans), sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-heading);
+    font-weight: 600;
+    letter-spacing: -0.014em;
+  }
+}
