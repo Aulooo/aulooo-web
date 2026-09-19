@@ -9,6 +9,8 @@ type RawAnnouncement = {
   publishedAt: string;
   createdAt: string;
   updatedAt: string;
+  audience: Announcement["audience"];
+  recipientStudentIds: string[];
 };
 
 function toAnnouncement({ announcementId, ...rest }: RawAnnouncement): Announcement {

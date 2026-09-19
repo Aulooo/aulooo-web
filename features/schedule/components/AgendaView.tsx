@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
-import { CalendarClock, CalendarSync, Clock4, Plus, X } from "lucide-react";
+import { CalendarClock, CalendarPlus, CalendarSync, Clock4, Plus, X } from "lucide-react";
 import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card } from "@/shared/components/ui/card";
@@ -22,6 +22,7 @@ import { formatDate, formatTime } from "@/shared/lib/format";
 // Import direto dos componentes (não via index.ts) — o index também exporta helpers
 // server-only (getMyRequests/getPolicy) que não podem entrar no bundle do client.
 import { MyRequestsList } from "@/features/rescheduling/components/MyRequestsList";
+import { RequestNewClassSheet } from "@/features/rescheduling/components/RequestNewClassSheet";
 import { RequestRescheduleSheet } from "@/features/rescheduling/components/RequestRescheduleSheet";
 import { cancelLesson } from "../actions/cancel-lesson";
 import { LessonFormSheet } from "./LessonFormSheet";
@@ -98,9 +99,18 @@ function LessonCard({
   );
 }
 
-export function AgendaView({ lessons, mode, students, studentNameById, myRequests = [] }: AgendaViewProps) {
+export function AgendaView({
+  lessons,
+  mode,
+  students,
+  studentNameById,
+  myRequests = [],
+  allowSelfScheduling = false,
+  slots = [],
+}: AgendaViewProps) {
   const [sheet, setSheet] = useState(false);
   const [rescheduleClassId, setRescheduleClassId] = useState<string | null>(null);
+  const [requestingNewClass, setRequestingNewClass] = useState(false);
   const [pending, startTransition] = useTransition();
   const canManage = mode === "manage";
 
@@ -125,7 +135,7 @@ export function AgendaView({ lessons, mode, students, studentNameById, myRequest
 
   return (
     <div className="space-y-4" data-tour="agenda-list">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h1 className="text-xl font-semibold text-foreground">Agenda</h1>
           <p className="text-sm text-muted-foreground">
@@ -133,24 +143,39 @@ export function AgendaView({ lessons, mode, students, studentNameById, myRequest
           </p>
         </div>
         {canManage ? (
-          <div className="flex shrink-0 items-center gap-2">
-            <Button variant="secondary" className="h-10" asChild data-tour="agenda-availability">
-              <Link href="/disponibilidade">
+          <div className="flex flex-wrap items-center gap-2">
+            <Button
+              variant="secondary"
+              className="h-10"
+              asChild
+              data-tour="agenda-availability"
+            >
+              <Link href="/disponibilidade" aria-label="Disponibilidade">
                 <Clock4 />
-                Disponibilidade
+                <span className="hidden sm:inline">Disponibilidade</span>
               </Link>
             </Button>
-            <Button variant="secondary" className="h-10" asChild data-tour="agenda-reagendamentos">
-              <Link href="/reagendamentos">
+            <Button
+              variant="secondary"
+              className="h-10"
+              asChild
+              data-tour="agenda-reagendamentos"
+            >
+              <Link href="/reagendamentos" aria-label="Reagendamentos">
                 <CalendarSync />
-                Reagendamentos
+                <span className="hidden sm:inline">Reagendamentos</span>
               </Link>
             </Button>
-            <Button className="h-10" onClick={() => setSheet(true)} data-tour="agenda-new">
+            <Button className="h-10" onClick={() => setSheet(true)} data-tour="agenda-new" aria-label="Nova aula">
               <Plus />
-              Nova aula
+              <span className="hidden sm:inline">Nova aula</span>
             </Button>
           </div>
+        ) : allowSelfScheduling ? (
+          <Button className="h-10 shrink-0" onClick={() => setRequestingNewClass(true)}>
+            <CalendarPlus />
+            Solicitar aula
+          </Button>
         ) : null}
       </div>
 
@@ -210,6 +235,10 @@ export function AgendaView({ lessons, mode, students, studentNameById, myRequest
 
       {rescheduleClassId ? (
         <RequestRescheduleSheet classId={rescheduleClassId} onClose={() => setRescheduleClassId(null)} />
+      ) : null}
+
+      {requestingNewClass ? (
+        <RequestNewClassSheet slots={slots} onClose={() => setRequestingNewClass(false)} />
       ) : null}
     </div>
   );

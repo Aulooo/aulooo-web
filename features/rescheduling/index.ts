@@ -1,7 +1,10 @@
 export { RequestRescheduleSheet } from "./components/RequestRescheduleSheet";
+export { RequestNewClassSheet } from "./components/RequestNewClassSheet";
 export { MyRequestsList } from "./components/MyRequestsList";
 export { ReschedulingRequestsView } from "./components/ReschedulingRequestsView";
-export type { RequestWithStudent } from "./components/ReschedulingRequestsView";
+export type { RequestWithStudent, SchedulingRequestWithStudent } from "./components/ReschedulingRequestsView";
 export { getMyRequests } from "./lib/get-my-requests";
+export { getMySchedulingRequests } from "./lib/get-my-scheduling-requests";
 export { getPolicy } from "./lib/get-policy";
-export type { ReschedulingRequestItem, ReschedulingPolicy } from "./types";
+export { getPolicyAsStudent } from "./lib/get-policy-as-student";
+export type { ReschedulingRequestItem, ReschedulingPolicy, SchedulingRequestItem } from "./types";

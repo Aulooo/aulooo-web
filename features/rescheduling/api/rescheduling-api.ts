@@ -5,6 +5,8 @@ import type {
   ReschedulingPolicyInput,
   ReschedulingRequestInput,
   ReschedulingRequestItem,
+  SchedulingRequestInput,
+  SchedulingRequestItem,
 } from "../types";
 
 type RawRequest = {
@@ -20,6 +22,22 @@ type RawRequest = {
 };
 
 function toRequest({ requestId, ...rest }: RawRequest): ReschedulingRequestItem {
+  return { id: requestId, ...rest };
+}
+
+type RawSchedulingRequest = {
+  requestId: string;
+  studentId: string;
+  requestedInterval: Interval;
+  status: string;
+  reason: string | null;
+  createdAt: string;
+  decidedAt: string | null;
+  decisionReason: string | null;
+  classId: string | null;
+};
+
+function toSchedulingRequest({ requestId, ...rest }: RawSchedulingRequest): SchedulingRequestItem {
   return { id: requestId, ...rest };
 }
 
@@ -54,6 +72,36 @@ export const reschedulingApi = {
 
   getPolicyAsProfessor: () => apiClient.get<ReschedulingPolicy>("/professors/me/rescheduling-policy"),
 
+  getPolicyAsStudent: () => apiClient.get<ReschedulingPolicy>("/students/me/rescheduling-policy"),
+
   updatePolicy: (input: ReschedulingPolicyInput) =>
     apiClient.patch<ReschedulingPolicy>("/professors/me/rescheduling-policy", input),
+
+  async createSchedulingRequest(input: SchedulingRequestInput) {
+    const res = await apiClient.post<RawSchedulingRequest>("/students/me/scheduling-requests", input);
+    return { ...res, data: res.data ? toSchedulingRequest(res.data) : null };
+  },
+
+  async listSchedulingRequestsAsStudent() {
+    const res = await apiClient.get<RawSchedulingRequest[]>("/students/me/scheduling-requests");
+    return { ...res, data: res.data?.map(toSchedulingRequest) ?? null };
+  },
+
+  async listSchedulingRequestsAsProfessor() {
+    const res = await apiClient.get<RawSchedulingRequest[]>("/professors/me/scheduling-requests");
+    return { ...res, data: res.data?.map(toSchedulingRequest) ?? null };
+  },
+
+  async approveSchedulingRequest(requestId: string) {
+    const res = await apiClient.post<RawSchedulingRequest>(`/professors/me/scheduling-requests/${requestId}/approve`);
+    return { ...res, data: res.data ? toSchedulingRequest(res.data) : null };
+  },
+
+  async rejectSchedulingRequest(requestId: string, reason?: string) {
+    const res = await apiClient.post<RawSchedulingRequest>(
+      `/professors/me/scheduling-requests/${requestId}/reject`,
+      reason ? { reason } : undefined,
+    );
+    return { ...res, data: res.data ? toSchedulingRequest(res.data) : null };
+  },
 };

@@ -1,8 +1,16 @@
 import { redirect } from "next/navigation";
-import { AgendaView, defaultAgendaRange, getMyClasses } from "@/features/schedule";
+import { AgendaView, defaultAgendaRange, getMyClasses, getStudentSlots } from "@/features/schedule";
 import { getMyStudents } from "@/features/students";
 import { getCurrentProfile } from "@/features/profile";
-import { getMyRequests } from "@/features/rescheduling";
+import { getMyRequests, getPolicyAsStudent } from "@/features/rescheduling";
+
+function slotsRange(): { from: string; to: string } {
+  const iso = (d: Date) => d.toISOString().slice(0, 10);
+  const from = new Date();
+  const to = new Date();
+  to.setDate(to.getDate() + 30);
+  return { from: iso(from), to: iso(to) };
+}
 
 export default async function AgendaPage() {
   const profile = await getCurrentProfile();
@@ -12,9 +20,21 @@ export default async function AgendaPage() {
   const lessons = await getMyClasses(profile.role, from, to);
 
   if (profile.role === "aluno") {
-    const myRequests = await getMyRequests("aluno");
+    const [myRequests, policy] = await Promise.all([getMyRequests("aluno"), getPolicyAsStudent()]);
+    const allowSelfScheduling = policy?.allowStudentSelfScheduling ?? false;
+    const range = slotsRange();
+    const slots = allowSelfScheduling ? await getStudentSlots(range.from, range.to) : [];
+
     return (
-      <AgendaView lessons={lessons} mode="read" students={[]} studentNameById={{}} myRequests={myRequests} />
+      <AgendaView
+        lessons={lessons}
+        mode="read"
+        students={[]}
+        studentNameById={{}}
+        myRequests={myRequests}
+        allowSelfScheduling={allowSelfScheduling}
+        slots={slots}
+      />
     );
   }
 

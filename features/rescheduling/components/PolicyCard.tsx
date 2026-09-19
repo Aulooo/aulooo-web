@@ -2,15 +2,19 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { Pencil, Settings2 } from "lucide-react";
+import { Badge } from "@/shared/components/ui/badge";
 import { Button } from "@/shared/components/ui/button";
 import { Card, CardContent } from "@/shared/components/ui/card";
 import { Field } from "@/shared/components/form/Field";
+import { Label } from "@/shared/components/ui/label";
+import { Switch } from "@/shared/components/ui/switch";
 import { IDLE_ACTION_STATE } from "@/shared/lib/action-state";
 import { savePolicy } from "../actions/save-policy";
 import type { ReschedulingPolicy } from "../types";
 
 export function PolicyCard({ policy }: { policy: ReschedulingPolicy }) {
   const [editing, setEditing] = useState(false);
+  const [selfScheduling, setSelfScheduling] = useState(policy.allowStudentSelfScheduling);
   const [state, formAction, pending] = useActionState(savePolicy, IDLE_ACTION_STATE);
 
   useEffect(() => {
@@ -50,6 +54,22 @@ export function PolicyCard({ policy }: { policy: ReschedulingPolicy }) {
                 error={state.errors?.monthlyLimit}
               />
             </div>
+
+            <div className="flex items-center justify-between gap-3 rounded-md border border-input px-3 py-2.5">
+              <div className="min-w-0">
+                <Label htmlFor="allowStudentSelfScheduling">Aluno pode solicitar aula nova</Label>
+                <p className="text-xs text-muted-foreground">
+                  Além de reagendar, o aluno também pode pedir um horário do zero (você ainda aprova).
+                </p>
+              </div>
+              <Switch
+                id="allowStudentSelfScheduling"
+                checked={selfScheduling}
+                onCheckedChange={setSelfScheduling}
+              />
+              <input type="hidden" name="allowStudentSelfScheduling" value={selfScheduling ? "on" : ""} />
+            </div>
+
             {!state.ok && state.message ? <p className="text-sm text-destructive">{state.message}</p> : null}
             <div className="flex justify-end gap-2">
               <Button type="button" variant="secondary" size="sm" onClick={() => setEditing(false)}>
@@ -61,20 +81,28 @@ export function PolicyCard({ policy }: { policy: ReschedulingPolicy }) {
             </div>
           </form>
         ) : (
-          <dl className="grid grid-cols-3 gap-3 text-sm">
-            <div>
-              <dt className="text-xs text-muted-foreground">Antecedência mínima</dt>
-              <dd className="font-medium text-foreground">{policy.minimumNoticeHours} h</dd>
+          <>
+            <dl className="grid grid-cols-3 gap-3 text-sm">
+              <div>
+                <dt className="text-xs text-muted-foreground">Antecedência mínima</dt>
+                <dd className="font-medium text-foreground">{policy.minimumNoticeHours} h</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Limite mensal</dt>
+                <dd className="font-medium text-foreground">{policy.monthlyLimit}</dd>
+              </div>
+              <div>
+                <dt className="text-xs text-muted-foreground">Janela</dt>
+                <dd className="font-medium text-foreground">{policy.windowDays} dias</dd>
+              </div>
+            </dl>
+            <div className="flex items-center gap-2 text-sm">
+              <span className="text-muted-foreground">Aluno solicita aula nova:</span>
+              <Badge variant={policy.allowStudentSelfScheduling ? "success" : "secondary"}>
+                {policy.allowStudentSelfScheduling ? "Ativado" : "Desativado"}
+              </Badge>
             </div>
-            <div>
-              <dt className="text-xs text-muted-foreground">Limite mensal</dt>
-              <dd className="font-medium text-foreground">{policy.monthlyLimit}</dd>
-            </div>
-            <div>
-              <dt className="text-xs text-muted-foreground">Janela</dt>
-              <dd className="font-medium text-foreground">{policy.windowDays} dias</dd>
-            </div>
-          </dl>
+          </>
         )}
       </CardContent>
     </Card>

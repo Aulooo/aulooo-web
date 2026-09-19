@@ -20,6 +20,7 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
   professor: [
     inicio,
     { label: "Alunos", href: "/alunos", icon: Users },
+    { label: "Agenda", href: "/agenda", icon: CalendarDays },
     materiais,
     perfil,
   ],
